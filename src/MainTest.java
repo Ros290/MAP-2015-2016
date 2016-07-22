@@ -8,8 +8,8 @@ public class MainTest
 	 */
 	public static void main(String[] args) throws FileNotFoundException
 	{
-		Data trainingSet= new Data("C:/Users/Windows 7/Desktop/DIB/Metodi Avanzati di Programmazione/CasoStudio 2015 -  2016/map2/prova.dat");
-		Data trainingSet2= new Data("C:/Users/Windows 7/Desktop/DIB/Metodi Avanzati di Programmazione/CasoStudio 2015 -  2016/map1/servo.dat");
+		Data trainingSet= new Data("prova.dat");
+		Data trainingSet2= new Data("servo.dat");
 		
 		/*
 		 * Metto un commento a cazzo, giusto per controllare se github individua la modifica da me effettuata
