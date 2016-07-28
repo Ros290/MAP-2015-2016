@@ -1,3 +1,4 @@
+/servo.dat
 /Attribute.class
 /ContinuousAttribute.class
 /Data.class
@@ -9,4 +10,3 @@
 /RegressionTree.class
 /SplitNode$SplitInfo.class
 /SplitNode.class
-/servo.dat
