@@ -1,6 +1,7 @@
 package tree;
 import data.Data;
 import data.DiscreteAttribute;
+import utility.Keyboard;
 
 public class RegressionTree 
 {
@@ -121,6 +122,22 @@ public class RegressionTree
 		public Double predictClass() throws UnknownValueException
 		{
 			//attributo che memorizza l'istanza dell'albero su cui si desidera compiere predizioni
+			if (root instanceof LeafNode)
+			{
+				LeafNode lf = (LeafNode) root;
+				return lf.predictedClassValue;
+			}
+			
+			else
+			{
+				SplitNode sn = (SplitNode) root;
+				System.out.println(sn.formulateQuery());
+				int choice = Keyboard.readInt();
+				if ((choice < 0) || (choice >= childTree.length))
+					throw new UnknownValueException();
+				return childTree[choice].predictClass();
+			}
+			/*
 			RegressionTree tree;
 			
 			if (tree.getIdNode() == 0){
@@ -129,6 +146,7 @@ public class RegressionTree
 			else{
 				return (Double) tree.getIdNode().formulateQuery();	
 			}
+			*/
 		}
 		
 		
