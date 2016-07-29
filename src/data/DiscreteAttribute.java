@@ -1,3 +1,5 @@
+package data;
+
 
 public class DiscreteAttribute extends Attribute 
 {
@@ -21,7 +23,7 @@ public class DiscreteAttribute extends Attribute
 	 * 
 	 * @return numero di valori discreti nell'attributo 
 	 */
-	int getNumberOfDistinctValues()
+	public int getNumberOfDistinctValues()
 	{
 		return this.values.length;
 	}

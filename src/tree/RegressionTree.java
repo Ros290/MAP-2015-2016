@@ -1,3 +1,7 @@
+package tree;
+import data.Data;
+import data.DiscreteAttribute;
+
 public class RegressionTree 
 {
 	Node root;
@@ -112,6 +116,19 @@ public class RegressionTree
 			System.out.println("********* TREE **********\n");
 			System.out.println(toString());
 			System.out.println("*************************\n");
+		}
+		
+		public Double predictClass() throws UnknownValueException
+		{
+			//attributo che memorizza l'istanza dell'albero su cui si desidera compiere predizioni
+			RegressionTree tree;
+			
+			if (tree.getIdNode() == 0){
+				return ((Double) tree.getIdNode().getPredictClassValue());
+			}
+			else{
+				return (Double) tree.getIdNode().formulateQuery();	
+			}
 		}
 		
 		

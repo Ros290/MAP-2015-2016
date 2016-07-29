@@ -1,3 +1,7 @@
+package tree;
+import data.Attribute;
+import data.Data;
+
 public abstract class SplitNode extends Node 
 {
 	// Classe che colelzione informazioni descrittive dello split

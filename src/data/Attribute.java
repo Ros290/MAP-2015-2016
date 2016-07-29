@@ -1,5 +1,6 @@
+package data;
 
-abstract class Attribute 
+public abstract class Attribute 
 {
 
 	protected String name;

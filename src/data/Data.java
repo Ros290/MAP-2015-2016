@@ -1,3 +1,4 @@
+package data;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -12,7 +13,7 @@ public class Data
 	private Attribute explanatorySet[];
 	private ContinuousAttribute classAttribute;
 	
-	Data(String fileName)throws FileNotFoundException
+	public Data(String fileName)throws FileNotFoundException, TrainingDataException
 	{
 		
 		  File inFile = new File (fileName);
@@ -226,7 +227,13 @@ public class Data
 	
 	public static void main(String args[])throws FileNotFoundException
 	{
-		Data trainingSet=new Data("C:/Users/Windows 7/Desktop/DIB/Metodi Avanzati di Programmazione/CasoStudio 2015 -  2016/map2/prova.dat");
+		Data trainingSet = null;
+		try {
+			trainingSet = new Data("C:/Users/Windows 7/Desktop/DIB/Metodi Avanzati di Programmazione/CasoStudio 2015 -  2016/map2/prova.dat");
+		} catch (TrainingDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println(trainingSet);
 		for(int jColumn=0;jColumn<trainingSet.getNumberOfExplanatoryAttributes();jColumn++)
 		{

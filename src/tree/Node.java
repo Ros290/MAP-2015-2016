@@ -1,3 +1,6 @@
+package tree;
+import data.Data;
+
 
 abstract class Node 
 {
