@@ -143,7 +143,7 @@ public abstract class SplitNode extends Node
 	{
 		String query = "";
 		for(int i=0;i<mapSplit.length;i++)
-			query += (i + ":" + attribute + mapSplit[i].getComparator() +mapSplit[i].getSplitValue())+"\n";
+			query += (i + ":" + attribute.getName() + mapSplit[i].getComparator() +mapSplit[i].getSplitValue().toString())+"\n";
 		return query;
 	}
 	

@@ -2,6 +2,8 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import tree.RegressionTree;
+import tree.UnknownValueException;
+import utility.Keyboard;
 import data.Data;
 import data.TrainingDataException;
 
@@ -13,22 +15,20 @@ public class MainTest
 	 */
 	public static void main(String[] args) throws FileNotFoundException
 	{
-		String flag;
-		do		
-		{
+		char flag;
+
 		Data trainingSet = null;
 		System.out.println("Inserire il nome del file contenente il training set desiderato");
-		Scanner in = new Scanner(System.in);
-		String ts = in.nextLine();
-		try {
+		//Scanner in = new Scanner(System.in);
+		//String ts = in.nextLine();
+		String ts = Keyboard.readString();
+		try 
+		{
 			//trainingSet = new Data("prova.dat");
 			trainingSet = new Data(ts);
 			System.out.println("Starting data acquisition phase!");
 			System.out.println("Starting learning phase!");
-		} catch (TrainingDataException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 		
 		/*
 		Data trainingSet2 = null;
@@ -44,14 +44,31 @@ public class MainTest
 		
 		tree.printRules();
 		tree.printTree();
+		do
+		{
+			System.out.println("Starting prediction phase!");
+			//tree2.printRules();
+			//tree2.printTree();
+			double attClass = tree.predictClass();
+			System.out.println(attClass);
+			System.out.println("Vuoi ripetere? (y/n)");
+			//Scanner in2 = new Scanner(System.in);
+			//flag = in2.nextLine();
+			flag = Keyboard.readChar();
+		}while((flag=='y') || (flag=='Y'));
 		
-		//tree2.printRules();
-		//tree2.printTree();
-		System.out.println("Vuoi ripetere? (y/n)");
-		Scanner in2 = new Scanner(System.in);
-		flag = in2.nextLine();
-		}while(flag=="y" || flag=="Y");
-
+		}
+		
+		catch (TrainingDataException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		catch (UnknownValueException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 }

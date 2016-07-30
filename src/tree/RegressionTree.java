@@ -107,6 +107,7 @@ public class RegressionTree
 					if (!rule.equals("") && i == 0)
 						rule += " AND ";
 					rule2 += childTree[i].printRules2( rule + sn.getAttribute().getName() + " = " + sn.getSplitInfo(i).getSplitValue().toString());
+					//rule2 += childTree[i].printRules2 ( rule + sn.formulateQuery());
 				}
 			}
 			return rule2;
@@ -134,7 +135,7 @@ public class RegressionTree
 				System.out.println(sn.formulateQuery());
 				int choice = Keyboard.readInt();
 				if ((choice < 0) || (choice >= childTree.length))
-					throw new UnknownValueException();
+					throw new UnknownValueException("The answer should be an integer between 0 and "+childTree.length+"!");
 				return childTree[choice].predictClass();
 			}
 			/*
