@@ -1,8 +1,13 @@
 package tree;
 import data.Data;
 import data.DiscreteAttribute;
+import exception.UnknownValueException;
 import utility.Keyboard;
 
+/*
+ * Struttura ad albero, ogni root può contenere o uno SplitNode (sotto-albero di profondità 1) o un nodo foglia.
+ * Qualora root avesse dei nodi figli, essi saranno definiti ricorsivamente come RegressionTree nel campo childTree
+ */
 public class RegressionTree 
 {
 	Node root;
@@ -13,9 +18,16 @@ public class RegressionTree
 		this.childTree = new RegressionTree [1];
 	}
 	
+	/**
+	 * definisce regressionTree come albero contenente i dati all'interno di Data
+	 * @param trainingSet collezione di esempi che si vuole riportare tramite RegressionTree
+	 */
 	public RegressionTree (Data trainingSet)
 	{
 		learnTree (trainingSet, 0, trainingSet.getNumberOfExamples()-1, (trainingSet.getNumberOfExamples() * 10)/100);
+		/*
+		 * il limite di figli per ogni nodo è pari al 10% del numero totale di tutti gli esempi all'interno della collezione
+		 */
 	}
 	
 	boolean isLeaf(Data trainingSet,int begin, int end,int numberOfExamplesPerLeaf)
@@ -23,12 +35,34 @@ public class RegressionTree
 		return ((end - begin)<= numberOfExamplesPerLeaf);
 	}
 	
+	/**
+	 * determina il "miglior" splitNode definibile con gli esempi compresi tra gli indici begin ed end nella collezione
+	 * 
+	 * @param trainingSet collezione degli esempi
+	 * @param begin indice della sotto-collezione da cui si vuole definire lo splitNode desiderato
+	 * @param end indice della sotto-collezione entro cui si vuole definire lo splitNode desiderato
+	 * @return ritorna il "miglior SplitNode definibile per la sotto-collezione passata in parametro
+	 */
 	SplitNode determineBestSplitNode(Data trainingSet,int begin,int end)
 	{
+		/*
+		 * è molto semplice, ogni splitNode definito fa riferimento ad un particolare attributo indipendente,
+		 * perciò quello che viene fatto qui è definire TUTTI i possibili splitNode definibili, quindi se ne creano tanti quanti sono
+		 * le classi indipendenti che definiscono la collezione. comincio a definire il primo splitNode col primo attributo indipendente
+		 * e lo assumo come splitNodePreferito, inteso come il miglior splitnode fin'ora trovato
+		 */
 		DiscreteNode splitNodoPreferito = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(0));
 		for (int i = 1; i < trainingSet.getNumberOfExplanatoryAttributes(); i++)
 		{
+			/*
+			 * definisco lo splitNodeCandidato, ovvero uno splitNode definito con un altro attributo indipendente, e lo 
+			 * confronterò con lo splitNodePreferito
+			 */
 			DiscreteNode splitNodoCandidato = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(i));
+			/*
+			 * confronto i due splitNode tramite le loro varianze, quello con la varianza migliore allora
+			 * sarà il miglior splitNode
+			 */
 			if (splitNodoCandidato.getVariance() < splitNodoPreferito.getVariance())
 				splitNodoPreferito = splitNodoCandidato;
 		}
@@ -107,7 +141,6 @@ public class RegressionTree
 					if (!rule.equals("") && i == 0)
 						rule += " AND ";
 					rule2 += childTree[i].printRules2( rule + sn.getAttribute().getName() + " = " + sn.getSplitInfo(i).getSplitValue().toString());
-					//rule2 += childTree[i].printRules2 ( rule + sn.formulateQuery());
 				}
 			}
 			return rule2;
@@ -120,34 +153,32 @@ public class RegressionTree
 			System.out.println("*************************\n");
 		}
 		
+		/**
+		 * consente all'utente di percorrere in profondità l'albero di decisione, seguendo il percorso
+		 * a proprio piacimento
+		 * @return ritorna il risultato della predizione
+		 * @throws UnknownValueException
+		 */
 		public Double predictClass() throws UnknownValueException
 		{
-			//attributo che memorizza l'istanza dell'albero su cui si desidera compiere predizioni
+			//controllo che tipo è root, se è foglia allora si è giunto a coclusione e ritorna l'attributo di classe trovato
 			if (root instanceof LeafNode)
 			{
 				LeafNode lf = (LeafNode) root;
 				return lf.predictedClassValue;
 			}
-			
+			//altrimeni è splitNode
 			else
 			{
 				SplitNode sn = (SplitNode) root;
+				//mostro quali sono i percorsi possibili per continuare la predizione
 				System.out.println(sn.formulateQuery());
 				int choice = Keyboard.readInt();
 				if ((choice < 0) || (choice >= childTree.length))
 					throw new UnknownValueException("The answer should be an integer between 0 and "+childTree.length+"!");
+				//ricevuta la scelta (choice) dall'utente, procedo con la predizione analizzando il figlio scelto
 				return childTree[choice].predictClass();
 			}
-			/*
-			RegressionTree tree;
-			
-			if (tree.getIdNode() == 0){
-				return ((Double) tree.getIdNode().getPredictClassValue());
-			}
-			else{
-				return (Double) tree.getIdNode().formulateQuery();	
-			}
-			*/
 		}
 		
 		

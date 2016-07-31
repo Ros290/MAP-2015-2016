@@ -1,6 +1,8 @@
 package data;
 
-
+/*
+ * Estensione della classe Attribute
+ */
 public class ContinuousAttribute extends Attribute
 {
     /**

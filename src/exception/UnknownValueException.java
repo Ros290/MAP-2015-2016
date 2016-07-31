@@ -1,4 +1,4 @@
-package tree;
+package exception;
 
 public class UnknownValueException extends Exception{
 	

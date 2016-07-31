@@ -3,6 +3,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import exception.TrainingDataException;
+
 
 
 public class Data 
@@ -21,7 +23,10 @@ public class Data
 		  Scanner sc = new Scanner (inFile);
 	      String line = sc.nextLine();
 	      if(!line.contains("@schema"))
+	      {
+	    	  sc.close();
 	    	  throw new RuntimeException("Errore nello schema");
+	      }
 	      String s[]=line.split(" ");
 
 		  //popolare explanatory Set 
@@ -86,7 +91,7 @@ public class Data
 	}
 	
 	/**
-	 * Ritorna la cardinalità degli esempi rimportati all'interno di Data
+	 * Ritorna il numero degli esempi rimportati all'interno di Data
 	 * @return cardinalità di esempi
 	 */
 	public int getNumberOfExamples ()
@@ -139,13 +144,21 @@ public class Data
 		return this.classAttribute;
 	}
 	
+	/**
+	 * Permette l'ordinamento degli esempi da beginExampleIndex a endExampleIndex, in base al valore che contengono
+	 * in un determinato attributo
+	 * @param attribute attributo indipendente, in modo tale che gli esempi vengano ordinati in base al valore assunto per quel 
+	 * determinato attributo
+	 * @param beginExampleIndex indice di partenza della sotto-collezione di data che si vuole ordinare
+	 * @param endExampleIndex indica la "fine" della sotto-collezione di data che si vuole ordinare
+	 */
 	public void sort(Attribute attribute, int beginExampleIndex, int endExampleIndex)
 	{
 		quicksort(attribute, beginExampleIndex, endExampleIndex);
 	}
 	
 	// scambio esempio i con esempi oj
-	void swap(int i,int j)
+	private void swap(int i,int j)
 	{
 		Object temp;
 		for (int k=0;k<getNumberOfExplanatoryAttributes()+1;k++){
@@ -224,23 +237,4 @@ public class Data
 		}
 		
 	}
-	
-	public static void main(String args[])throws FileNotFoundException
-	{
-		Data trainingSet = null;
-		try {
-			trainingSet = new Data("C:/Users/Windows 7/Desktop/DIB/Metodi Avanzati di Programmazione/CasoStudio 2015 -  2016/map2/prova.dat");
-		} catch (TrainingDataException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println(trainingSet);
-		for(int jColumn=0;jColumn<trainingSet.getNumberOfExplanatoryAttributes();jColumn++)
-		{
-			System.out.println("ORDER BY "+trainingSet.getExplanatoryAttribute(jColumn).getName());
-			trainingSet.quicksort(trainingSet.getExplanatoryAttribute(jColumn),0 , trainingSet.getNumberOfExamples()-1);
-			System.out.println(trainingSet);
-		}
-	}
-
 }

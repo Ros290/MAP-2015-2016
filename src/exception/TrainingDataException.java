@@ -1,4 +1,4 @@
-package data;
+package exception;
 
 public class TrainingDataException extends Exception{
 	

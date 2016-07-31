@@ -1,5 +1,8 @@
 package data;
 
+/*
+ * Classe che contiene un campo attributo (stringa) e un indice (int)
+ */
 public abstract class Attribute 
 {
 
