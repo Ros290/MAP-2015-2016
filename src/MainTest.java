@@ -10,7 +10,7 @@ import exception.UnknownValueException;
 public class MainTest 
 {
 
-	public static void main(String[] args) throws FileNotFoundException
+	public static void main(String[] args)
 	{
 		char flag;
 		Data trainingSet = null;
@@ -26,9 +26,16 @@ public class MainTest
 			tree.printTree();
 			do
 			{
-				System.out.println("Starting prediction phase!");
-				double attClass = tree.predictClass();
-				System.out.println(attClass);
+				try
+				{
+					System.out.println("Starting prediction phase!");
+					double attClass = tree.predictClass();
+					System.out.println(attClass);
+				}
+				catch (UnknownValueException e)
+				{
+					System.out.println(e.toString());
+				}
 				System.out.println("Vuoi ripetere? (y/n)");
 				flag = Keyboard.readChar();
 			}while((flag=='y') || (flag=='Y'));
@@ -36,13 +43,15 @@ public class MainTest
 		
 		catch (TrainingDataException e) 
 		{
-			e.printStackTrace();
+			System.out.println(e.getMessage());
+		} 
+		catch (FileNotFoundException e) 
+		{
+			System.out.println(e.getMessage());
 		}
 		
-		catch (UnknownValueException e)
-		{
-			e.printStackTrace();
-		}
+
+		
 	}
 	
 }

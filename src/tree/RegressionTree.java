@@ -175,7 +175,7 @@ public class RegressionTree
 				System.out.println(sn.formulateQuery());
 				int choice = Keyboard.readInt();
 				if ((choice < 0) || (choice >= childTree.length))
-					throw new UnknownValueException("The answer should be an integer between 0 and "+childTree.length+"!");
+					throw new UnknownValueException("The answer should be an integer between 0 and "+(childTree.length-1)+"!");
 				//ricevuta la scelta (choice) dall'utente, procedo con la predizione analizzando il figlio scelto
 				return childTree[choice].predictClass();
 			}
