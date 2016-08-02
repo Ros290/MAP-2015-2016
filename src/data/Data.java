@@ -1,6 +1,10 @@
 package data;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -31,27 +35,26 @@ public class Data
 	    	  sc.close();
 	    	  throw new RuntimeException("Errore nello schema");
 	      }
-	      String s[]=line.split(" ");
-
+	      //String s[]=line.split(" ");
 		  //popolare explanatory Set 
 	      //@schema 4
-			
-		  explanatorySet = new Attribute[new Integer(s[1])];
-		  short iAttribute=0;
+	      
+		  //explanatorySet = new Attribute[new Integer(s[1])];
+	      short iAttribute=0;
 	      line = sc.nextLine();
 	      while(!line.contains("@data"))
 	      {
-	    	  s=line.split(" ");
-	    	  if(s[0].equals("@desc"))
+	    	  //s=line.split(" ");
+	    	  List <String> s = new ArrayList <String> (Arrays.asList(line.split(" ")));
+	    	  //if(s[0].equals("@desc"))
+	    	  if (s.get(0).equals("@desc"))
 	    	  { // aggiungo l'attributo allo spazio descrittivo
 		    		//@desc motor discrete A,B,C,D,E  
-		    		  Set<String> discreteValues=s[2].split(",");
-	    		 // Set<String> discreteValues2=s[2].split(",");
-	    		  ///Set<String> discreteValues= discreteValues2;
-		    		  explanatorySet[iAttribute] = new DiscreteAttribute(s[1],iAttribute, discreteValues);
+	    		  	Set<String> discreteValues = new HashSet <String> (Arrays.asList(s.get(2).split(",")));
+	    		  	explanatorySet.add(new DiscreteAttribute (s.get(1), iAttribute, discreteValues ));
 		      }
-	    	  else if(s[0].equals("@target"))
-	    			  classAttribute=new ContinuousAttribute(s[1], iAttribute);
+	    	  else if(s.get(0).equals("@target"))
+	    			  classAttribute=new ContinuousAttribute(s.get(1), iAttribute);
 	    			  
 	    	  iAttribute++;
 	    	  line = sc.nextLine();
@@ -69,12 +72,17 @@ public class Data
 	      {
 	    	  line = sc.nextLine();
 	    	  // assumo che attributi siano tutti discreti
+	    	  /*
 	    	  s=line.split(","); //E,E,5,4, 0.28125095
 	    	  for(short jColumn=0;jColumn<s.length-1;jColumn++)
-	    		  data[iRow][jColumn]=s[jColumn];
+	    	  	  data[iRow][jColumn]=s[jColumn];
 	    	  data[iRow][s.length-1]=new Double(s[s.length-1]);
+	    	   */
+	    	  List <String> s = new ArrayList <String> (Arrays.asList(line.split(",")));
+	    	  for(short jColumn=0;jColumn<s.size()-1;jColumn++)
+	    		  data[iRow][jColumn]=s.get(jColumn);
+	    	  data[iRow][s.size()-1]=new Double(s.get(s.size()-1));
 	    	  iRow++;
-	    	  
 	      }
 		  sc.close();
 	}

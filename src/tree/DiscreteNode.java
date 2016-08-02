@@ -63,12 +63,13 @@ public class DiscreteNode extends SplitNode
 		mapSplit2 [child] = new SplitInfo (trainingSet.getExplanatoryValue(i-1, attribute.getIndex()), start, i, child);
 		
 		//mapSplit = new SplitInfo[child+1];
-		mapSplit.add(child, new SplitInfo(trainingSet.getExplanatoryValue(beginExampleIndex, attribute.getIndex()), start, endExampleIndex, child+1));
+		//mapSplit.add(child, new SplitInfo(trainingSet.getExplanatoryValue(beginExampleIndex, attribute.getIndex()), start, endExampleIndex, child+1));
 		i = 0;
 		while (i <= child)
 		{
 			//mapSplit[i] = mapSplit2 [i];
-			mapSplit.add(i, new SplitInfo (trainingSet.getExplanatoryValue(i-1, attribute.getIndex()), start, i, i));
+			//mapSplit.add(i, new SplitInfo (trainingSet.getExplanatoryValue(i-1, attribute.getIndex()), start, i, i));
+			mapSplit.add(mapSplit2[i]);
 			i++;
 		}
 	}
