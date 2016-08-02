@@ -1,4 +1,6 @@
 package tree;
+import java.util.TreeSet;
+
 import data.Data;
 import data.DiscreteAttribute;
 import exception.UnknownValueException;
@@ -51,14 +53,21 @@ public class RegressionTree
 		 * le classi indipendenti che definiscono la collezione. comincio a definire il primo splitNode col primo attributo indipendente
 		 * e lo assumo come splitNodePreferito, inteso come il miglior splitnode fin'ora trovato
 		 */
-		DiscreteNode splitNodoPreferito = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(0));
+		
+		TreeSet<SplitNode> ts = new TreeSet<SplitNode>();
+		
+		//DiscreteNode splitNodoPreferito = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(0));
+		SplitNode splitNodoPreferito = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(0));
+		
 		for (int i = 1; i < trainingSet.getNumberOfExplanatoryAttributes(); i++)
 		{
 			/*
 			 * definisco lo splitNodeCandidato, ovvero uno splitNode definito con un altro attributo indipendente, e lo 
 			 * confronterò con lo splitNodePreferito
 			 */
-			DiscreteNode splitNodoCandidato = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(i));
+			//DiscreteNode splitNodoCandidato = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(i));
+			SplitNode splitNodoCandidato = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(i));
+			
 			/*
 			 * confronto i due splitNode tramite le loro varianze, quello con la varianza migliore allora
 			 * sarà il miglior splitNode

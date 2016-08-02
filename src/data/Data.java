@@ -1,7 +1,10 @@
 package data;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import exception.TrainingDataException;
 
@@ -12,7 +15,8 @@ public class Data
 	
 	private Object data [][];
 	private int numberOfExamples;
-	private Attribute explanatorySet[];
+	//private Attribute explanatorySet[];
+	private List<Attribute> explanatorySet = new LinkedList<Attribute>();
 	private ContinuousAttribute classAttribute;
 	
 	public Data(String fileName)throws FileNotFoundException, TrainingDataException
@@ -41,7 +45,9 @@ public class Data
 	    	  if(s[0].equals("@desc"))
 	    	  { // aggiungo l'attributo allo spazio descrittivo
 		    		//@desc motor discrete A,B,C,D,E  
-		    		  String discreteValues[]=s[2].split(",");
+		    		  Set<String> discreteValues=s[2].split(",");
+	    		 // Set<String> discreteValues2=s[2].split(",");
+	    		  ///Set<String> discreteValues= discreteValues2;
 		    		  explanatorySet[iAttribute] = new DiscreteAttribute(s[1],iAttribute, discreteValues);
 		      }
 	    	  else if(s[0].equals("@target"))
@@ -57,7 +63,7 @@ public class Data
 	      numberOfExamples=new Integer(line.split(" ")[1]);
 	      
 	      //popolare data
-	      data=new Object[numberOfExamples][explanatorySet.length+1];
+	      data=new Object[numberOfExamples][explanatorySet.size()+1];
 	      short iRow=0;
 	      while (sc.hasNextLine())
 	      {
@@ -83,9 +89,9 @@ public class Data
 		String value="";
 		for(int i=0;i<numberOfExamples;i++)
 		{
-			for(int j=0;j<explanatorySet.length;j++)
+			for(int j=0;j<explanatorySet.size();j++)
 				value+=data[i][j]+",";
-			value+=data[i][explanatorySet.length]+"\n";
+			value+=data[i][explanatorySet.size()]+"\n";
 		}
 		return value;
 	}
@@ -105,7 +111,7 @@ public class Data
 	 */
 	public int getNumberOfExplanatoryAttributes()
 	{
-		return this.explanatorySet.length;
+		return this.explanatorySet.size();
 	}
 	
 	/**
@@ -115,7 +121,7 @@ public class Data
 	 */
 	public Double getClassValue (int exampleIndex)
 	{
-		return (Double) data[exampleIndex][this.explanatorySet.length];
+		return (Double) data[exampleIndex][this.explanatorySet.size()];
 	}
 	
 	/**
@@ -136,7 +142,7 @@ public class Data
 	 */
 	public Attribute getExplanatoryAttribute(int index)
 	{
-		return this.explanatorySet[index];
+		return this.explanatorySet.get(index);
 	}
 
 	public ContinuousAttribute getClassAttribute()

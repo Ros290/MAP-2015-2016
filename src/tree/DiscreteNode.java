@@ -61,14 +61,47 @@ public class DiscreteNode extends SplitNode
 			}
 		}
 		mapSplit2 [child] = new SplitInfo (trainingSet.getExplanatoryValue(i-1, attribute.getIndex()), start, i, child);
-		mapSplit = new SplitInfo [child+1];
+		
+		//mapSplit = new SplitInfo[child+1];
+		mapSplit.add(child, new SplitInfo(trainingSet.getExplanatoryValue(beginExampleIndex, attribute.getIndex()), start, endExampleIndex, child+1));
 		i = 0;
 		while (i <= child)
 		{
-			mapSplit [i] = mapSplit2 [i];
+			//mapSplit[i] = mapSplit2 [i];
+			mapSplit.add(i, new SplitInfo (trainingSet.getExplanatoryValue(i-1, attribute.getIndex()), start, i, i));
 			i++;
 		}
 	}
+	
+	
+	/*
+	 * Luigi io metto tutto fra commenti in modo tale da non confondere nulla, e non creare danni, comunque scrivo qui una nuova versione della 
+	 * funzione setSpliValue
+	 * questa funzione dovrebbe a rigor di logica fare esattamente la stessa cosa della tua,
+	 * solo che non usa mapSplit2
+	 * tuttavia non ho provato, volevo prima fartela vedere
+	 
+	void setSplitInfo(Data trainingSet,int beginExampleIndex, int endExampleIndex, Attribute attribute)
+	{
+		Object currentSplitValue = trainingSet.getExpanatoryValue(beginExampleIndex, attribute.getIndex());
+		int start = beginExampleIndex;
+		int child = 0;
+		for(i = beginExampleIndex + 1; i < endExampleIndex; i++)
+		{
+			if ( currentSplitValue.equals(trainingSet.getExplanatoryValue(i, attribute.getIndex())) == false)
+			{
+				mapSplit.add(child, new SplitInfo(currentSplitValue, beginSplit, i-1, child));
+				currentSplitValue = trainingSet.getExplanatoryValue(i, attribute,getIndex());
+				child ++;
+				beginSplit = i;
+			}
+		}
+		mapSplit.add(child, new SplitInfo(currentSplitValue, bginSplit, endExampleIndex, child);
+	}
+	 * */
+	
+	
+	
 	
 	/**
 	 * Effettua il confronto di value con i valori di tutti i nodi figli dello splitNode in analisi, restituisce 
@@ -79,10 +112,10 @@ public class DiscreteNode extends SplitNode
 	@Override
 	public int testCondition (Object value)
 	{
-		for (int i = 0; i < mapSplit.length; i++)
+		for (int i = 0; i < mapSplit.size(); i++)
 		{
-			if (value.equals(mapSplit[i].getSplitValue()))
-				return mapSplit[i].numberChild;
+			if (value.equals(mapSplit.get(i).getSplitValue()))
+				return mapSplit.get(i).numberChild;
 		}
 		return -1;
 	}
@@ -91,4 +124,16 @@ public class DiscreteNode extends SplitNode
 	{	
 		return "DISCRETE " + super.toString();
 	}
+
+	
+	@Override
+	public int compareTo(SplitNode o) {
+		if(o.getVariance() == this.getVariance())
+		     return 0;
+		else
+			if(o.getVariance() < this.getVariance())
+				 return -1;
+		return 1;
+	}
+
 }

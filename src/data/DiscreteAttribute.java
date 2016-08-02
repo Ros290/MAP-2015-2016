@@ -1,9 +1,13 @@
 package data;
 
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
-public class DiscreteAttribute extends Attribute 
+
+public class DiscreteAttribute extends Attribute implements Iterable<String>
 {
-	private String values[];
+	private Set<String> values=new TreeSet<String>();
 
     /**
      * Inizializza
@@ -12,7 +16,7 @@ public class DiscreteAttribute extends Attribute
      * @param index  identificativo dell'attributo
      * @param values dominio dell'attributo
      */
-	public DiscreteAttribute (String name, int index, String values[])
+	public DiscreteAttribute (String name, int index, Set<String> values)
 	{
 		super (name, index);
 		this.values=values;
@@ -25,16 +29,12 @@ public class DiscreteAttribute extends Attribute
 	 */
 	public int getNumberOfDistinctValues()
 	{
-		return this.values.length;
+		return this.values.size();
 	}
 	
-	/**
-	 * Ottiene il valore discreto in posizione i-esima
-	 * @param i posizione in cui si trova il valore discreto desiderato
-	 * @return valore discreto in posizione i-esima
-	 */
-	String getValue (int i)
+	@Override
+	public Iterator<String> iterator()
 	{
-		return this.values[i];
-	}
+		return values.iterator();
+	}	
 }

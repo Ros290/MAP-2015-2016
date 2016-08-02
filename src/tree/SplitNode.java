@@ -1,8 +1,11 @@
 package tree;
+import java.util.List;
+import java.util.ArrayList;
+
 import data.Attribute;
 import data.Data;
 
-public abstract class SplitNode extends Node 
+public abstract class SplitNode extends Node implements Comparable<SplitNode>
 {
 	// Classe che colelzione informazioni descrittive dello split
 	class SplitInfo
@@ -81,13 +84,13 @@ public abstract class SplitNode extends Node
 		{
 			return comparator;
 		}
-	
 		
 	}
 
 	private Attribute attribute;	
 
-	protected SplitInfo mapSplit[];
+	//protected SplitInfo mapSplit[];
+	List<SplitInfo> mapSplit = new ArrayList<SplitInfo>();
 	
 	protected double splitVariance;
 		
@@ -111,9 +114,9 @@ public abstract class SplitNode extends Node
 						
 			//compute variance
 			splitVariance = 0;
-			for(int i=0;i<mapSplit.length;i++)
+			for(int i=0;i<mapSplit.size();i++)
 			{
-					double localVariance = new LeafNode(trainingSet, mapSplit[i].getBeginindex(),mapSplit[i].getEndIndex()).getVariance();
+					double localVariance = new LeafNode(trainingSet, mapSplit.get(i).getBeginindex(),mapSplit.get(i).getEndIndex()).getVariance();
 					splitVariance += (localVariance);
 			}
 	}
@@ -130,20 +133,20 @@ public abstract class SplitNode extends Node
 	
 	int getNumberOfChildren()
 	{
-		return mapSplit.length;
+		return mapSplit.size();
 	}
 	
 	SplitInfo getSplitInfo(int child)
 	{
-		return mapSplit[child];
+		return mapSplit.get(child);
 	}
 
 	
 	String formulateQuery()
 	{
 		String query = "";
-		for(int i=0;i<mapSplit.length;i++)
-			query += (i + ":" + attribute.getName() + mapSplit[i].getComparator() +mapSplit[i].getSplitValue().toString())+"\n";
+		for(int i=0;i<mapSplit.size();i++)
+			query += (i + ":" + attribute.getName() + mapSplit.get(i).getComparator() +mapSplit.get(i).getSplitValue().toString())+"\n";
 		return query;
 	}
 	
@@ -151,11 +154,12 @@ public abstract class SplitNode extends Node
 	{
 		String v= "SPLIT : attribute=" +attribute.getName() +" "+ super.toString()+  " Split Variance: " + getVariance()+ "\n" ;
 		
-		for(int i=0;i<mapSplit.length;i++)
+		for(int i=0;i<mapSplit.size();i++)
 		{
-			v+= "\t"+mapSplit[i]+"\n";
+			v+= "\t"+mapSplit.get(i)+"\n";
 		}
 		
 		return v;
 	}
+	
 }
