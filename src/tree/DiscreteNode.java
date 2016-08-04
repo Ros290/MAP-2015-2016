@@ -1,5 +1,4 @@
 package tree;
-import tree.SplitNode.SplitInfo;
 import data.Attribute;
 import data.Data;
 import data.DiscreteAttribute;
@@ -42,65 +41,21 @@ public class DiscreteNode extends SplitNode
 		 * presnti nella collezione di Training 
 		 */
 		
-		SplitInfo mapSplit2 [] = new SplitInfo [((DiscreteAttribute)attribute).getNumberOfDistinctValues()];
-		int child = 0;
-		int i;
+		Object currentSplitValue = trainingSet.getExplanatoryValue(beginExampleIndex, attribute.getIndex());
 		int start = beginExampleIndex;
-		for(i = beginExampleIndex + 1; i < endExampleIndex; i++)
+		int child = 0;
+		for(int i = beginExampleIndex + 1; i < endExampleIndex; i++)
 		{
-			/*
-			 * Supponendo che il trainingSet sia stato ordinato in base all'attributo di cui stiamo i nodi split candidati
-			 * allora, scandendo un esempio alla volta, quando individua un esempio (con indice i) con attributo differente dall'esempio precedente (indice i - 1),
-			 * allora inserisce nel mapSplit il nodo split con il valore dell'attributo dell'esempio precedente 
-			 */
-			if (!trainingSet.getExplanatoryValue(i, attribute.getIndex()).equals(trainingSet.getExplanatoryValue(i-1, attribute.getIndex())))
+			if ( currentSplitValue.equals(trainingSet.getExplanatoryValue(i, attribute.getIndex())) == false)
 			{
-				mapSplit2 [child] = new SplitInfo (trainingSet.getExplanatoryValue(i-1, attribute.getIndex()), start, i - 1, child);
+				mapSplit.add(child, new SplitInfo(currentSplitValue, start, i-1, child));
+				currentSplitValue = trainingSet.getExplanatoryValue(i, attribute.getIndex());
 				child ++;
 				start = i;
 			}
 		}
-		mapSplit2 [child] = new SplitInfo (trainingSet.getExplanatoryValue(i-1, attribute.getIndex()), start, i, child);
-		
-		//mapSplit = new SplitInfo[child+1];
-		//mapSplit.add(child, new SplitInfo(trainingSet.getExplanatoryValue(beginExampleIndex, attribute.getIndex()), start, endExampleIndex, child+1));
-		i = 0;
-		while (i <= child)
-		{
-			//mapSplit[i] = mapSplit2 [i];
-			//mapSplit.add(i, new SplitInfo (trainingSet.getExplanatoryValue(i-1, attribute.getIndex()), start, i, i));
-			mapSplit.add(mapSplit2[i]);
-			i++;
-		}
+		mapSplit.add(child, new SplitInfo(currentSplitValue, start, endExampleIndex, child));
 	}
-	
-	
-	/*
-	 * Luigi io metto tutto fra commenti in modo tale da non confondere nulla, e non creare danni, comunque scrivo qui una nuova versione della 
-	 * funzione setSpliValue
-	 * questa funzione dovrebbe a rigor di logica fare esattamente la stessa cosa della tua,
-	 * solo che non usa mapSplit2
-	 * tuttavia non ho provato, volevo prima fartela vedere
-	 
-	void setSplitInfo(Data trainingSet,int beginExampleIndex, int endExampleIndex, Attribute attribute)
-	{
-		Object currentSplitValue = trainingSet.getExpanatoryValue(beginExampleIndex, attribute.getIndex());
-		int start = beginExampleIndex;
-		int child = 0;
-		for(i = beginExampleIndex + 1; i < endExampleIndex; i++)
-		{
-			if ( currentSplitValue.equals(trainingSet.getExplanatoryValue(i, attribute.getIndex())) == false)
-			{
-				mapSplit.add(child, new SplitInfo(currentSplitValue, beginSplit, i-1, child));
-				currentSplitValue = trainingSet.getExplanatoryValue(i, attribute,getIndex());
-				child ++;
-				beginSplit = i;
-			}
-		}
-		mapSplit.add(child, new SplitInfo(currentSplitValue, bginSplit, endExampleIndex, child);
-	}
-	 * */
-	
 	
 	
 	
