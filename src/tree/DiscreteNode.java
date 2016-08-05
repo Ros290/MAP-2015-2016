@@ -1,10 +1,11 @@
 package tree;
+
 import data.Attribute;
 import data.Data;
 import data.DiscreteAttribute;
 
 
-public class DiscreteNode extends SplitNode 
+public class DiscreteNode extends SplitNode
 {
 	/**
 	 * Costruttore di uno SplitNode con attributo indipendente di tipo discreto 
@@ -80,16 +81,20 @@ public class DiscreteNode extends SplitNode
 	{	
 		return "DISCRETE " + super.toString();
 	}
-
 	
-	@Override
-	public int compareTo(SplitNode o) {
+	/**
+	 * Effettua il confronto con un altro SplitNode, in base al risultato si può capire quale sia lo splitNode con meno Varianza
+	 * @param o SplitNode da confrontare con quello corrente
+	 * @return 0 se gli SplitNode hanno stessa varianza, 1 se o ha la varianza minore, -1 altrimenti
+	 */
+	public int compareTo(SplitNode o) 
+	{
 		if(o.getVariance() == this.getVariance())
 		     return 0;
 		else
 			if(o.getVariance() < this.getVariance())
-				 return -1;
-		return 1;
+				 return 1;
+		return -1;
 	}
 
 }

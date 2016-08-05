@@ -50,41 +50,34 @@ public class RegressionTree
 		/*
 		 * è molto semplice, ogni splitNode definito fa riferimento ad un particolare attributo indipendente,
 		 * perciò quello che viene fatto qui è definire TUTTI i possibili splitNode definibili, quindi se ne creano tanti quanti sono
-		 * le classi indipendenti che definiscono la collezione. comincio a definire il primo splitNode col primo attributo indipendente
-		 * e lo assumo come splitNodePreferito, inteso come il miglior splitnode fin'ora trovato
+		 * le classi indipendenti che definiscono la sotto-collezione. lo SplitNode che ha la varianza minore rispetto agli altri,
+		 * allora sarà il "miglior" splitNode ricavabile dalla sotto-collezione
 		 */
 		
-		TreeSet<SplitNode> ts = new TreeSet<SplitNode>();
-		
-		//DiscreteNode splitNodoPreferito = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(0));
-		SplitNode splitNodoPreferito = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(0));
-		
-		for (int i = 1; i < trainingSet.getNumberOfExplanatoryAttributes(); i++)
+		/*
+		 * Il TreeSet permette di ordinare automaticamente, ovvero ad ogni nuova aggiunta (add) di un elemento, l'unica
+		 * premessa è che la classe quale sarà contenuta nel treeSet (in questo caso "SplitNode") deve
+		 * fare l'override della funzione compareTo , implementandolo dalla classe Comparator <SplitNode>
+		 */
+		TreeSet<SplitNode> ts = new TreeSet<SplitNode>();	
+		for (int i = 0; i < trainingSet.getNumberOfExplanatoryAttributes(); i++)
 		{
-			/*
-			 * definisco lo splitNodeCandidato, ovvero uno splitNode definito con un altro attributo indipendente, e lo 
-			 * confronterò con lo splitNodePreferito
-			 */
-			//DiscreteNode splitNodoCandidato = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(i));
-			SplitNode splitNodoCandidato = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(i));
-			
-			ts.add(splitNodoCandidato);
-			/*
-			 * confronto i due splitNode tramite le loro varianze, quello con la varianza migliore allora
-			 * sarà il miglior splitNode
-			 */
-			if (splitNodoCandidato.getVariance() < splitNodoPreferito.getVariance())
-				splitNodoPreferito = splitNodoCandidato;
+			ts.add(new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(i)));
 		}
 		
 		/*
-		 * Poichè ad ogni nuovo splitNode definito, l'ordine degli esempi presenti nel trainingSet varia
+		 * Poichè ad ogni nuovo splitNode definito, l'ordine degli esempi presenti nel trainingSet varia.
 		 * allora svolgo un nuovo ordinamento, in base all'attributo dello splitNode che è stato scelto
 		 * così da poter garantire una corretta esecuzione qualora si necessitase di definire ultieriori
-		 * splitnode nel sottoinsieme del trainingSet
+		 * splitnode nel sottoinsieme del trainingSet (semplicemente, provate a non fare l'ordinamento e
+		 * guardacaso gli splitNode saranno "sballati" da come ci si dovrebbe aspettare!)
+		 * 
+		 * Nel caso del treeSet, il "miglior" splitNode è quello più "piccolo" (inteso in base alla sua varianza 
+		 * rispetto a quello degli altri "candidati")
 		 */
-		trainingSet.sort(splitNodoPreferito.getAttribute(), begin, end);
-		return splitNodoPreferito;
+		
+		trainingSet.sort(ts.first().getAttribute(), begin, end);
+		return ts.first();
 	}
 	
 		private void learnTree(Data trainingSet,int begin, int end,int numberOfExamplesPerLeaf)
