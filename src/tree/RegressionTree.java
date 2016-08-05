@@ -68,6 +68,7 @@ public class RegressionTree
 			//DiscreteNode splitNodoCandidato = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(i));
 			SplitNode splitNodoCandidato = new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(i));
 			
+			ts.add(splitNodoCandidato);
 			/*
 			 * confronto i due splitNode tramite le loro varianze, quello con la varianza migliore allora
 			 * sarà il miglior splitNode
