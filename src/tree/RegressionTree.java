@@ -80,6 +80,19 @@ public class RegressionTree
 		return ts.first();
 	}
 	
+		/**
+		 * Costruttore di alberi di regressione in maniera ricorsiva (definisce 
+		 * il sotto-albero di prondità 1 e definisce gli eventuali sotto-alberi dei suoi figli, e 
+		 * così via dicendo dei figli dei figli e blablabla). Occhio ad usarlo, può influire in 
+		 * maniera non banale sul trainingSet. per la costruzione dell'albero di regressione verrano 
+		 * considerati tutti gli esempi che saranno compresi dall'indice begin all'indice end del 
+		 * trainingSet.
+		 * 
+		 * @param trainingSet collezione di esempi che si vuole riportare all'interno di un albero di regressione
+		 * @param begin indice della sotto-collezione da cui si vuole definire lo splitNode desiderato
+		 * @param end indice della sotto-collezione entro cui si vuole definire lo splitNode desiderato
+		 * @param numberOfExamplesPerLeaf definisce il limite massimo di figli che può avere un padre
+		 */
 		private void learnTree(Data trainingSet,int begin, int end,int numberOfExamplesPerLeaf)
 		{
 			if( isLeaf(trainingSet, begin, end, numberOfExamplesPerLeaf))
@@ -120,7 +133,9 @@ public class RegressionTree
 			return tree;
 		}
 		
-
+		/**
+		 * Stampa le regole dell'albero di regressione
+		 */
 		public void printRules()
 		{
 			System.out.println("********* RULES ***********\n");
@@ -149,6 +164,9 @@ public class RegressionTree
 			return rule2;
 		}
 		
+		/**
+		 *Stampa l'albero di regressione 
+		 */
 		public void printTree()
 		{
 			System.out.println("********* TREE **********\n");
