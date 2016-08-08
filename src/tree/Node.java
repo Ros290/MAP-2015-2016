@@ -82,6 +82,6 @@ abstract class Node
 	
 	public String toString ()
 	{
-		return "[Examples:" + this.beginExampleIndex + "-" + (this.endExampleIndex) + "] variance:" + this.variance;
+		return " Nodo: [Examples:" + this.beginExampleIndex + "-" + (this.endExampleIndex) + "] variance:" + this.variance;
 	}
 }
