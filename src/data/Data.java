@@ -43,14 +43,19 @@ public class Data
 	      line = sc.nextLine();
 	      while(!line.contains("@data"))
 	      {
-	    	  //s=line.split(" ");
 	    	  List <String> s = new ArrayList <String> (Arrays.asList(line.split(" ")));
-	    	  //if(s[0].equals("@desc"))
 	    	  if (s.get(0).equals("@desc"))
 	    	  { // aggiungo l'attributo allo spazio descrittivo
-		    		//@desc motor discrete A,B,C,D,E  
-	    		  	Set<String> discreteValues = new HashSet <String> (Arrays.asList(s.get(2).split(",")));
-	    		  	explanatorySet.add(new DiscreteAttribute (s.get(1), iAttribute, discreteValues ));
+		    		//@desc KmPercorsi => Continuous Attribute
+	    		    if (s.size() == 2)
+	    		    	explanatorySet.add (new ContinuousAttribute (s.get(1), iAttribute));
+	    		    else
+	    		    //@desc motor A,B,C,D,E => discrete Attribute
+	    		    {
+		    		  	Set<String> discreteValues = new HashSet <String> (Arrays.asList(s.get(2).split(",")));
+		    		  	explanatorySet.add(new DiscreteAttribute (s.get(1), iAttribute, discreteValues ));	    		    	
+	    		    }
+
 		      }
 	    	  else if(s.get(0).equals("@target"))
 	    			  classAttribute=new ContinuousAttribute(s.get(1), iAttribute);
@@ -188,7 +193,7 @@ public class Data
 	/*
 	 * Partiziona il vettore rispetto all'elemento x e restiutisce il punto di separazione
 	 */
-	private  int partition(DiscreteAttribute attribute, int inf, int sup)
+	private  int partition(Attribute attribute, int inf, int sup)
 	{
 		int i,j;
 	
@@ -234,7 +239,7 @@ public class Data
 			
 			int pos;
 			
-			pos=partition((DiscreteAttribute)attribute, inf, sup);
+			pos=partition((Attribute)attribute, inf, sup);
 					
 			if ((pos-inf) < (sup-pos+1)) {
 				quicksort(attribute, inf, pos-1); 

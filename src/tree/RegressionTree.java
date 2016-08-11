@@ -1,6 +1,8 @@
 package tree;
 import java.util.TreeSet;
 
+import data.Attribute;
+import data.ContinuousAttribute;
 import data.Data;
 import data.DiscreteAttribute;
 import exception.UnknownValueException;
@@ -62,7 +64,14 @@ public class RegressionTree
 		TreeSet<SplitNode> ts = new TreeSet<SplitNode>();	
 		for (int i = 0; i < trainingSet.getNumberOfExplanatoryAttributes(); i++)
 		{
-			ts.add(new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(i)));
+			Attribute a = trainingSet.getExplanatoryAttribute(i);
+			SplitNode currentNode;
+			if (a instanceof DiscreteAttribute)
+				currentNode = new DiscreteNode (trainingSet, begin, end , (DiscreteAttribute)trainingSet.getExplanatoryAttribute(i));
+			else
+				currentNode = new ContinuousNode (trainingSet, begin, end , (ContinuousAttribute)trainingSet.getExplanatoryAttribute(i));
+			ts.add(currentNode);
+			//ts.add(new DiscreteNode (trainingSet, begin, end, (DiscreteAttribute)trainingSet.getExplanatoryAttribute(i)));
 		}
 		
 		/*
