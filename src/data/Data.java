@@ -1,6 +1,7 @@
 package data;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -13,7 +14,8 @@ import exception.TrainingDataException;
 
 
 
-public class Data 
+@SuppressWarnings("serial")
+public class Data implements Serializable
 {
 	
 	private Object data [][];
@@ -84,9 +86,6 @@ public class Data
 	    	   */
 	    	  List <String> s = new ArrayList <String> (Arrays.asList(line.split(",")));
 	    	  for(short jColumn=0;jColumn<s.size()-1;jColumn++)
-	    	  if (explanatorySet.get(jColumn) instanceof ContinuousAttribute)
-	    		  data[iRow][jColumn]=new Double (s.get(jColumn));
-	    	  else
 	    		  data[iRow][jColumn]=s.get(jColumn);
 	    	  data[iRow][s.size()-1]=new Double(s.get(s.size()-1));
 	    	  iRow++;
@@ -203,21 +202,18 @@ public class Data
 		i=inf; 
 		j=sup; 
 		int	med=(inf+sup)/2;
-		//String x=(String)getExplanatoryValue(med, attribute.getIndex());
-		String x=getExplanatoryValue(med, attribute.getIndex()).toString();
+		String x=(String)getExplanatoryValue(med, attribute.getIndex());
 		swap(inf,med);
 	
 		while (true) 
 		{
 			
-			//while(i<=sup && ((String)getExplanatoryValue(i, attribute.getIndex())).compareTo(x)<=0)
-			while(i<=sup && (getExplanatoryValue(i, attribute.getIndex())).toString().compareTo(x)<=0)
+			while(i<=sup && ((String)getExplanatoryValue(i, attribute.getIndex())).compareTo(x)<=0)
 			{ 
 				i++; 	
 			}
 		
-			//while(((String)getExplanatoryValue(j, attribute.getIndex())).compareTo(x)>0)
-			while((getExplanatoryValue(j, attribute.getIndex())).toString().compareTo(x)>0) 
+			while(((String)getExplanatoryValue(j, attribute.getIndex())).compareTo(x)>0) 
 			{
 				j--;
 			}

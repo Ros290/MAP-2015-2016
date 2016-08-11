@@ -1,8 +1,11 @@
 package tree;
+import java.io.Serializable;
+
 import data.Data;
 
 
-abstract class Node 
+@SuppressWarnings("serial")
+abstract class Node implements Serializable
 {
 	private static int idNodeCount = 0;
 	private int idNode;

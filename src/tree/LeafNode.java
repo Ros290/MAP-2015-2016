@@ -1,8 +1,11 @@
 package tree;
+import java.io.Serializable;
+
 import data.Data;
 
 
-public class LeafNode extends Node
+@SuppressWarnings("serial")
+public class LeafNode extends Node implements Serializable
 {
 	Double predictedClassValue;
 	

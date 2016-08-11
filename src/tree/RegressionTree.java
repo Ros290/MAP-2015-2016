@@ -1,4 +1,11 @@
 package tree;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.TreeSet;
 
 import data.Attribute;
@@ -12,7 +19,8 @@ import utility.Keyboard;
  * Struttura ad albero, ogni root può contenere o uno SplitNode (sotto-albero di profondità 1) o un nodo foglia.
  * Qualora root avesse dei nodi figli, essi saranno definiti ricorsivamente come RegressionTree nel campo childTree
  */
-public class RegressionTree 
+@SuppressWarnings("serial")
+public class RegressionTree implements Serializable 
 {
 	Node root;
 	RegressionTree childTree[];
@@ -33,6 +41,40 @@ public class RegressionTree
 		 * il limite di figli per ogni nodo è pari al 10% del numero totale di tutti gli esempi all'interno della collezione
 		 */
 	}
+	
+	/**
+	 * Serializza l’oggetto riferito da this nel file il cui nome è passato come parametro.
+	 * 
+	 * @param nomeFile               nome del file
+	 * @throws FileNotFoundException se il file non esiste
+	 * @throws IOException           se le operazioni di I/O sono fallite o interrotte
+	 */
+	public void salva(String nomeFile) throws FileNotFoundException, IOException {
+		FileOutputStream outFile = new FileOutputStream(nomeFile);
+		ObjectOutputStream outStream = new ObjectOutputStream(outFile);
+		outStream.writeObject(this);
+		outStream.close();		
+	}
+	
+	/**
+	 * Legge e restituisce l’oggetto come è memorizzato nel file il cui nome è passato come 
+	 * parametro.
+	 * 
+	 * @param nomeFile                nome del file
+	 * @return                        oggetto memorizzato nel file
+	 * @throws FileNotFoundException  se il file non esiste
+	 * @throws IOException            se le operazioni di I/O sono fallite o interrotte
+	 * @throws ClassNotFoundException se si verifica un type mismatch
+	 */
+	public static RegressionTree carica(String nomeFile) throws FileNotFoundException, IOException, ClassNotFoundException{
+		FileInputStream inFile = new FileInputStream(nomeFile);
+		ObjectInputStream inStream = new ObjectInputStream(inFile);
+		RegressionTree regT = (RegressionTree) inStream.readObject();
+		inStream.close();
+		return regT;
+	}
+
+
 	
 	boolean isLeaf(Data trainingSet,int begin, int end,int numberOfExamplesPerLeaf)
 	{
