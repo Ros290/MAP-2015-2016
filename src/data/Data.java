@@ -211,12 +211,12 @@ public class Data implements Serializable
 		while (true) 
 		{
 			
-			while(i<=sup && ((String)getExplanatoryValue(i, attribute.getIndex())).compareTo(x)<=0)
+			while(i<=sup && (getExplanatoryValue(i, attribute.getIndex())).toString().compareTo(x)<=0)
 			{ 
 				i++; 	
 			}
 		
-			while(((String)getExplanatoryValue(j, attribute.getIndex())).compareTo(x)>0)
+			while((getExplanatoryValue(j, attribute.getIndex())).toString().compareTo(x)>0)
 			{
 				j--;
 			}
