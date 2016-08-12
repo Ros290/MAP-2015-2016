@@ -61,7 +61,7 @@ public class MainTest {
 				return;
 			}
 			tree.printRules();
-	//		tree.printTree();
+			tree.printTree();
 			
 			char risp='y';
 			do{

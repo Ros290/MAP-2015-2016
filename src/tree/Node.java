@@ -85,6 +85,6 @@ abstract class Node implements Serializable
 	
 	public String toString ()
 	{
-		return " Nodo: [Examples:" + this.beginExampleIndex + "-" + (this.endExampleIndex) + "] variance:" + this.variance;
+		return " Nodo: [Examples:" + this.beginExampleIndex + "-" + (this.endExampleIndex) + "] " + "\nvariance:" + this.variance;
 	}
 }

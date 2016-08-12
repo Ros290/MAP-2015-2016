@@ -21,6 +21,8 @@ public abstract class Attribute
         this.index = index;
     }
     
+    Attribute(){}
+    
     /**
      * Ottiene il nome dell'attributo
      *

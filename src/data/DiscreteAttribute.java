@@ -24,6 +24,8 @@ public class DiscreteAttribute extends Attribute implements Iterable<String>, Se
 		this.values=values;
 	}
 	
+	
+	
 	/**
 	 * Ottiene il numero di valori discreti nell'attributo
 	 * 
