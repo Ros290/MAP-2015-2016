@@ -1,9 +1,11 @@
 package data;
 
+import java.io.Serializable;
+
 /*
  * Classe che contiene un campo attributo (stringa) e un indice (int)
  */
-public abstract class Attribute 
+public abstract class Attribute implements Serializable
 {
 
 	protected String name;
@@ -21,7 +23,6 @@ public abstract class Attribute
         this.index = index;
     }
     
-    Attribute(){}
     
     /**
      * Ottiene il nome dell'attributo
