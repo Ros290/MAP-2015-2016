@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+import database.DbAccess;
+import database.Example;
+import database.TableData;
 import exception.TrainingDataException;
 
 
@@ -18,9 +21,10 @@ import exception.TrainingDataException;
 public class Data implements Serializable
 {
 	
-	private Object data [][];
+	//private Object data [][];
+	private List<Example> data = new ArrayList<Example>();
+	
 	private int numberOfExamples;
-	//private Attribute explanatorySet[];
 	private List<Attribute> explanatorySet = new LinkedList<Attribute>();
 	private ContinuousAttribute classAttribute;
 	
@@ -73,6 +77,7 @@ public class Data implements Serializable
 	      
 	      //popolare data
 	      data=new Object[numberOfExamples][explanatorySet.size()+1];
+	      		     
 	      short iRow=0;
 	      while (sc.hasNextLine())
 	      {
@@ -88,7 +93,7 @@ public class Data implements Serializable
 	    	  for(short jColumn=0;jColumn<s.size()-1;jColumn++)
 		      if (explanatorySet.get(jColumn) instanceof ContinuousAttribute)
 		    	  data[iRow][jColumn]=new Double (s.get(jColumn));
-		      else
+	    	  else
 	    		  data[iRow][jColumn]=s.get(jColumn);
 	    	  data[iRow][s.size()-1]=new Double(s.get(s.size()-1));
 	    	  iRow++;
@@ -107,8 +112,10 @@ public class Data implements Serializable
 		for(int i=0;i<numberOfExamples;i++)
 		{
 			for(int j=0;j<explanatorySet.size();j++)
-				value+=data[i][j]+",";
-			value+=data[i][explanatorySet.size()]+"\n";
+				//value+=data[i][j]+",";
+				value+=data.get(i).get(j)+",";
+			//value+=data[i][explanatorySet.size()]+"\n";
+			value+=data.get(i).get(explanatorySet.size())+"\n";
 		}
 		return value;
 	}
@@ -138,7 +145,8 @@ public class Data implements Serializable
 	 */
 	public Double getClassValue (int exampleIndex)
 	{
-		return (Double) data[exampleIndex][this.explanatorySet.size()];
+		//return (Double) data[exampleIndex][this.explanatorySet.size()];
+		return (Double) data.get(exampleIndex).get(this.explanatorySet.size());
 	}
 	
 	/**
@@ -149,7 +157,8 @@ public class Data implements Serializable
 	 */
 	public Object getExplanatoryValue(int exampleIndex, int attributeIndex)
 	{
-		return data[exampleIndex][attributeIndex];
+		//return data[exampleIndex][attributeIndex];
+		return data.get(exampleIndex).get(attributeIndex);
 	}
 	
 	/**
@@ -185,9 +194,15 @@ public class Data implements Serializable
 	{
 		Object temp;
 		for (int k=0;k<getNumberOfExplanatoryAttributes()+1;k++){
+			/*
 			temp=data[i][k];
 			data[i][k]=data[j][k];
 			data[j][k]=temp;
+			*/
+			temp=data.get(i).get(k);
+			data[i][k]=data.get(j).get(k);
+			data[j][k]=temp;
+			
 		}
 		
 	}
