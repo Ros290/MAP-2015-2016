@@ -21,7 +21,7 @@ public class TableData {
 		LinkedList<Example> transSet = new LinkedList<Example>();
 		Statement statement;
 		TableSchema tSchema=new TableSchema(db,table);
-			
+		
 		String query="select ";
 		
 		for(int i=0;i<tSchema.getNumberOfAttributes();i++){
@@ -66,7 +66,7 @@ public class TableData {
 	
 		Statement statement = DbAccess.getConnection().createStatement();
 		
-		String query="SELECT" + column.getColumnName() + "FROM" + table + "ORDER BY" + column.getColumnName();
+		String query="SELECT " + column.getColumnName() + " FROM " + table + " ORDER BY " + column.getColumnName();
 		
 		ResultSet rs = statement.executeQuery(query);
 		int index = 1;
@@ -79,5 +79,4 @@ public class TableData {
 				
 		return transSet;
 	}
-
 }

@@ -18,18 +18,19 @@ public class MainTest {
 		
 		
 		int decision=0;
-		do{
+		do
+		{
 			System.out.println("Scegli una opzione");
 			do{
-			System.out.println("(1) Leggi Regression Tree da file");
+			System.out.println("(1) Leggi Regression Tree da DB");
 			System.out.println("(2) Carica Regression Tree da archivio ");
 			System.out.print("Risposta: ");
 			decision=Keyboard.readInt();
 		}while(!(decision==1) && !(decision ==2));
 		
-		String trainingfileName="";
-		System.out.println("File name:");
-		trainingfileName=Keyboard.readString();
+		String trainingTableName="";
+		System.out.println("Table name:");
+		trainingTableName=Keyboard.readString();
 		
 		
 		RegressionTree tree=null;
@@ -39,14 +40,14 @@ public class MainTest {
 			Data trainingSet=null;
 			try{
 			
-				trainingSet= new Data(trainingfileName+ ".dat");
+				trainingSet= new Data(trainingTableName);
 			}
 			catch(TrainingDataException e){System.out.println(e);return;}
 		
 			System.out.println("Starting learning phase!");
 			tree=new RegressionTree(trainingSet);
 			try {
-				tree.salva(trainingfileName+".dmp");
+				tree.salva(trainingTableName+".dmp");
 				//aggiunto per vedere se lo salva correttamente
 				System.out.println("SALVATAGGIO RIUSCITO CORRETTAMENTE");
 			} catch (IOException e) {
@@ -55,7 +56,7 @@ public class MainTest {
 			}
 		} else
 			try {
-				tree=RegressionTree.carica(trainingfileName+".dmp");
+				tree=RegressionTree.carica(trainingTableName+".dmp");
 			} catch (ClassNotFoundException | IOException e) {
 				System.out.print(e);
 				return;

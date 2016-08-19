@@ -2,6 +2,7 @@ package data;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,9 +11,12 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+import database.DatabaseConnectionException;
 import database.DbAccess;
+import database.EmptySetException;
 import database.Example;
 import database.TableData;
+import database.TableSchema;
 import exception.TrainingDataException;
 
 
@@ -28,9 +32,53 @@ public class Data implements Serializable
 	private List<Attribute> explanatorySet = new LinkedList<Attribute>();
 	private ContinuousAttribute classAttribute;
 	
-	public Data(String fileName)throws FileNotFoundException, TrainingDataException
+	public Data(String tableName)throws FileNotFoundException, TrainingDataException
 	{
+		int i;
+		DbAccess db = new DbAccess();
+		TableData td = new TableData (db);
+		try 
+		{
+			db.initConnection();
+			TableSchema ts = new TableSchema (db, tableName);
+			this.data = td.getTransazioni(tableName);
+			this.numberOfExamples = data.size();
+			for (i = 0; i < ts.getNumberOfAttributes() - 1; i++)
+			{
+				if (ts.getColumn(i).isNumber())
+					this.explanatorySet.add(new ContinuousAttribute (ts.getColumn(i).getColumnName(),i));
+				else
+				{
+					Set<Object> discreteValues = td.getDistinctColumnValues(tableName, ts.getColumn(i));
+					this.explanatorySet.add ( new DiscreteAttribute (ts.getColumn(i).getColumnName(),i, discreteValues));
+				}
+			}
+			this.classAttribute = new ContinuousAttribute (ts.getColumn(i).getColumnName(),i);
+			
+		} 
+		catch (ClassNotFoundException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		catch (DatabaseConnectionException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (SQLException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		catch (EmptySetException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		
+	/*
 		  File inFile = new File (fileName);
 
 		  Scanner sc = new Scanner (inFile);
@@ -89,6 +137,7 @@ public class Data implements Serializable
 	    	  	  data[iRow][jColumn]=s[jColumn];
 	    	  data[iRow][s.length-1]=new Double(s[s.length-1]);
 	    	   */
+				/*
 	    	  List <String> s = new ArrayList <String> (Arrays.asList(line.split(",")));
 	    	  for(short jColumn=0;jColumn<s.size()-1;jColumn++)
 		      if (explanatorySet.get(jColumn) instanceof ContinuousAttribute)
@@ -99,6 +148,7 @@ public class Data implements Serializable
 	    	  iRow++;
 	      }
 		  sc.close();
+	*/
 	}
 	
 	/**
@@ -192,16 +242,16 @@ public class Data implements Serializable
 	// scambio esempio i con esempi oj
 	private void swap(int i,int j)
 	{
-		Object temp;
+		Example temp;
 		for (int k=0;k<getNumberOfExplanatoryAttributes()+1;k++){
 			/*
 			temp=data[i][k];
 			data[i][k]=data[j][k];
 			data[j][k]=temp;
 			*/
-			temp=data.get(i).get(k);
-			data[i][k]=data.get(j).get(k);
-			data[j][k]=temp;
+			temp=data.get(i);
+			data.set(i, data.get(j));
+			data.set(j,temp);
 			
 		}
 		

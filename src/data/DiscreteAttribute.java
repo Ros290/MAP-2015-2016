@@ -7,9 +7,9 @@ import java.util.TreeSet;
 
 
 @SuppressWarnings("serial")
-public class DiscreteAttribute extends Attribute implements Iterable<String>, Serializable
+public class DiscreteAttribute extends Attribute implements Iterable<Object>, Serializable
 {
-	private Set<String> values=new TreeSet<String>();
+	private Set<Object> values=new TreeSet<Object>();
 
     /**
      * Inizializza
@@ -18,7 +18,7 @@ public class DiscreteAttribute extends Attribute implements Iterable<String>, Se
      * @param index  identificativo dell'attributo
      * @param values dominio dell'attributo
      */
-	public DiscreteAttribute (String name, int index, Set<String> values)
+	public DiscreteAttribute (String name, int index, Set<Object> values)
 	{
 		super (name, index);
 		this.values=values;
@@ -37,7 +37,7 @@ public class DiscreteAttribute extends Attribute implements Iterable<String>, Se
 	}
 	
 	@Override
-	public Iterator<String> iterator()
+	public Iterator<Object> iterator()
 	{
 		return values.iterator();
 	}	
