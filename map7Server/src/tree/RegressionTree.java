@@ -6,14 +6,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.Socket;
 import java.util.Scanner;
 import java.util.TreeSet;
 
-import server.UnknownValueException;
 import data.Attribute;
 import data.ContinuousAttribute;
 import data.Data;
 import data.DiscreteAttribute;
+import exception.UnknownValueException;
 
 /*
  * Struttura ad albero, ogni root può contenere o uno SplitNode (sotto-albero di profondità 1) o un nodo foglia.
@@ -187,11 +188,13 @@ public class RegressionTree implements Serializable
 		/**
 		 * Stampa le regole dell'albero di regressione
 		 */
-		public void printRules()
+		public String printRules()
 		{
-			System.out.println("********* RULES ***********\n");
-			System.out.println(printRules2(""));
-			System.out.println("**************************\n");
+			String x = "";
+			x += "********* RULES ***********\n";
+			x += printRules2("");
+			x += "**************************\n";
+			return x;
 		}
 		
 		private String printRules2(String rule)
@@ -218,11 +221,13 @@ public class RegressionTree implements Serializable
 		/**
 		 *Stampa l'albero di regressione 
 		 */
-		public void printTree()
+		public String printTree()
 		{
-			System.out.println("********* TREE **********\n");
-			System.out.println(toString());
-			System.out.println("*************************\n");
+			String x = "";
+			x += "********* TREE **********\n";
+			x += toString();
+			x += "*************************\n";
+			return x;
 		}
 		
 		/**
@@ -252,6 +257,54 @@ public class RegressionTree implements Serializable
 				//ricevuta la scelta (choice) dall'utente, procedo con la predizione analizzando il figlio scelto
 				return childTree[choice].predictClass();
 			}
+		}
+		
+		protected static Object readObject(Socket socket) throws ClassNotFoundException, IOException
+		{
+			Object o;
+			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+			o = in.readObject();
+			return o;
+		}
+		
+		protected static void writeObject(Socket socket, Object o) throws IOException
+		{
+			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+			out.writeObject(o);
+			out.flush();
+		}
+		
+		public Double predictClassServer(Socket socket) throws UnknownValueException
+		{
+			try
+			{
+			//controllo che tipo è root, se è foglia allora si è giunto a coclusione e ritorna l'attributo di classe trovato
+			if (root instanceof LeafNode)
+			{
+				LeafNode lf = (LeafNode) root;
+				writeObject(socket,"trovato");
+				return lf.predictedClassValue;
+			}
+			//altrimeni è splitNode
+			else
+			{
+				SplitNode sn = (SplitNode) root;
+				//mostro quali sono i percorsi possibili per continuare la predizione
+				writeObject(socket,sn.formulateQuery());
+				int choice = ((Integer)readObject(socket)).intValue();
+				if ((choice < 0) || (choice >= childTree.length))
+					throw new UnknownValueException("The answer should be an integer between 0 and "+(childTree.length-1)+"!");
+				//ricevuta la scelta (choice) dall'utente, procedo con la predizione analizzando il figlio scelto
+				return childTree[choice].predictClassServer(socket);
+			}
+			}
+			catch (IOException e)
+			{
+			}
+			catch (ClassNotFoundException e)
+			{
+			}
+			return 0.0;
 		}
 		
 		

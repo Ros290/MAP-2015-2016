@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-import database.DatabaseConnectionException;
 import database.DbAccess;
-import database.EmptySetException;
 import database.Example;
 import database.TableData;
 import database.TableSchema;
+import exception.DatabaseConnectionException;
+import exception.EmptySetException;
 import exception.TrainingDataException;
 
 

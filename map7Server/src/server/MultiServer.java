@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 
+
 public class MultiServer extends Thread{
 	//public static final int PORT = 8080;
 	private int PORT;
@@ -57,9 +58,16 @@ public class MultiServer extends Thread{
 			}
 	}
 	
-	/*
-	public static void main(int PORT){
-		new MultiServer(PORT);
-	}*/
+    public static void main(String[] args) {
+        int port = 8080;
+        if (args.length > 1)
+            {   try {
+                 port = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                // nessun bisogno di gestire questa eccezione
+                  }
+            }
+               new MultiServer(port).run();
+    }
 
 	}

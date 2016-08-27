@@ -115,6 +115,7 @@ import utility.Keyboard;
 }
 */
 
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -132,6 +133,21 @@ public class MainTest {
 	 * @throws IOException 
 	 * @throws ClassNotFoundException 
 	 */
+	
+	protected static Object readObject(Socket socket) throws ClassNotFoundException, IOException
+	{
+		Object o;
+		ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+		o = in.readObject();
+		return o;
+	}
+	
+	protected static void writeObject(Socket socket, Object o) throws IOException
+	{
+		ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+		out.writeObject(o);
+		out.flush();
+	}
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 
 		// TO CHANGE: ip server e porta devono essere acquisiti come parametri
@@ -140,8 +156,8 @@ public class MainTest {
 		Socket socket = new Socket(addr, MainTest.PORT);
 		System.out.println(socket);
 
-		ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-		ObjectInputStream in = new ObjectInputStream(socket.getInputStream());	; // stream con richieste del client
+		//ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+		//ObjectInputStream in = new ObjectInputStream(socket.getInputStream());	; // stream con richieste del client
 
 		int scelta;
 
@@ -153,48 +169,61 @@ public class MainTest {
 			System.out.println("5. Exit :");
 			scelta = Keyboard.readInt();
 			Object outputVal=null;
+			String stringa = "";
+			char flag;
 			switch(scelta)
 			{
 			case 1:
 				// TO DO
-				out.writeObject(new Integer(1));
+				//out.writeObject(new Integer(1));
+				writeObject(socket,new Integer(1));
 				System.out.println("Inserire il nome della tabella:");
-				out.writeObject(Keyboard.readString());
-				outputVal=in.readObject();
+				//out.writeObject(Keyboard.readString());
+				writeObject(socket,Keyboard.readString());
+				//outputVal=in.readObject();
+				outputVal = readObject (socket);
 				break;
+				
 			case 2:
-				// TO DO
-				out.writeObject(new Integer(2));
-				String flag = "true";
-				flag = (String)in.readObject();
-				if (flag.equals("true")){
+				//out.writeObject(new Integer(2));
+				writeObject (socket, new Integer (2));
+				flag = (char)readObject(socket);
+				if (flag == 'T')
+				{
 					System.out.println("Inserire il nome del file su cui salvare l'albero:");
-					out.writeObject(Keyboard.readString());}
-				outputVal=in.readObject();
+					//out.writeObject(Keyboard.readString());
+					writeObject(socket, Keyboard.readString());
+				}
+				//outputVal=in.readObject();
+				outputVal = readObject (socket);
 				break;
+				
 			case 3:
-				// TO DO
-				out.writeObject(new Integer(3));
+				//out.writeObject(new Integer(3));
+				writeObject (socket, new Integer (3));
 				System.out.println("Inserire il nome del file da cui caricare l'albero:");
-				out.writeObject(Keyboard.readString());
-				outputVal=in.readObject();
+				//out.writeObject(Keyboard.readString());
+				writeObject (socket, Keyboard.readString());
+				//outputVal=in.readObject();
+				outputVal = readObject (socket);
 				break;
+				
 			case 4:
-				out.writeObject(new Integer(4));
-				outputVal=in.readObject();
-				while(!(outputVal instanceof Exception || ((String)outputVal).equals("Transmitting class ..."))) {
-					System.out.println(outputVal);				
-					out.writeObject(new Integer(Keyboard.readInt()));
-					try{
-						outputVal=in.readObject();
-					} catch(Exception e){
-						break;
+				writeObject (socket, new Integer (4));
+				flag = (char)readObject(socket);
+				if (flag != 'F')
+				{
+					stringa = new String ((String) readObject (socket));
+					while (!stringa.equals("trovato"))
+					{	
+						System.out.println(stringa);
+						writeObject(socket,Keyboard.readInt());
+						stringa = new String ((String) readObject (socket));
 					}
 				}
-				
-				//if(outputVal instanceof String)
-					outputVal=in.readObject();
+				outputVal = readObject (socket);
 				break;
+				
 			case 5:
 				System.out.println("USCITA");
 				System.exit(0);

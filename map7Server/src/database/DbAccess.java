@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import exception.DatabaseConnectionException;
+
 public class DbAccess {
 	
 	private static String DRIVER_CLASS_NAME = "org.gjt.mm.mysql.Driver";

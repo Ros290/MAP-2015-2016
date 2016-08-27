@@ -8,21 +8,33 @@ import java.net.Socket;
 
 import data.Data;
 import exception.TrainingDataException;
+import exception.UnknownValueException;
 import tree.LeafNode;
 import tree.RegressionTree;
 
 class ServeOneClient extends Thread {
 	private Socket socket;
-	private ObjectInputStream in; // stream con richieste del client
-	private ObjectOutputStream out;
 
 	RegressionTree tree;
 
 	public ServeOneClient(Socket s) throws IOException {
 		socket = s;
-		in = new ObjectInputStream(socket.getInputStream());
-		out = new ObjectOutputStream(socket.getOutputStream());
 		start();
+	}
+	
+	protected static Object readObject(Socket socket) throws ClassNotFoundException, IOException
+	{
+		Object o;
+		ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+		o = in.readObject();
+		return o;
+	}
+	
+	protected static void writeObject(Socket socket, Object o) throws IOException
+	{
+		ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+		out.writeObject(o);
+		out.flush();
 	}
 
 	public void run() {
@@ -31,94 +43,111 @@ class ServeOneClient extends Thread {
 			while (true) {
 				try{	
 					String nome = "";
-					int command = ((Integer)in.readObject()).intValue();
+					//int command = ((Integer)in.readObject()).intValue();
+					int command = ((Integer)readObject(socket)).intValue();
 					switch(command)
 					{
 					case 1: // LEARNING A REGRESSION TREE
-						nome = (String)in.readObject();
+						//nome = (String)in.readObject();
+						nome = (String) readObject (socket);
 						Data trainingSet = new Data(nome);
 						tree = new RegressionTree(trainingSet);
-						out.writeObject("Acquisito.");
+						//out.writeObject("Acquisito.");
+						writeObject(socket,tree.printRules() + tree.printTree());
 						break;
 					case 2: // SERIALIZE THE CURRENT REGRESSION TREE ON A FILE
-						if( tree != null){
-							nome = (String)in.readObject();
+						if( tree != null)
+						{
+							writeObject (socket,'T');
+							//nome = (String)in.readObject();
+							nome = (String)readObject(socket);
 							tree.salva(nome);
-							out.writeObject("Salvato.");}
-						else{
-							out.writeObject("false");
-							throw new TrainingDataException();}
+							//out.writeObject("Salvato.");
+							writeObject(socket,"Salvato");
+						}
+						else
+						{
+							//out.writeObject("false");
+							writeObject(socket,'F');
+							throw new TrainingDataException();
+						}
 						break;
 					case 3: // STORE THE REGRESSION TREE FROM FILE
-						nome = (String)in.readObject();
+						//nome = (String)in.readObject();
+						nome = (String) readObject(socket);
 						tree = RegressionTree.carica(nome);
-						out.writeObject("Caricato.");
+						//out.writeObject("Caricato.");
+						writeObject(socket,tree.printRules() + tree.printTree());
 						break;
-					/*	
+					
 					case 4: //USE THE CURRENT TREE TO PREDICT AN EXAMPLE
-						try {
-							String classValue = predictClass(tree);
-							out.writeObject("Transmitting class ...");
-							out.writeObject("CLASSE:" + classValue);
+						try
+						{
+						if (tree != null)
+						{
+							writeObject (socket, 'T');
+							writeObject(socket,tree.predictClassServer(socket));
 						}
-						catch (NullPointerException e) {
-							System.out.println("Prediction: Albero non esistente.");
-							out.writeObject(e);
-							out.writeObject("Albero non esistente.");
+						else
+						{
+							writeObject(socket,'F');
+							throw new TrainingDataException();
 						}
-						catch(UnknownValueException e){
-							System.out.println("Prediction: Opzione scelta inesistente.");
-							out.writeObject((Exception)e);
-							out.writeObject("Scelta non valida.");
 						}
-						break;*/
+						catch (UnknownValueException e)
+						{
+							writeObject(socket,e.toString());
+						}
+						break;
 					default:
 						System.out.println("COMANDO INESISTENTE");
-						out.writeObject("COMANDO INESISTENTE");
+						//out.writeObject("COMANDO INESISTENTE");
+						writeObject (socket, "COMANDO INESISTENTE");
 					}// END SWITCH
-				} catch(IOException e){
+				} 
+				catch(IOException e)
+				{
 					if (e instanceof FileNotFoundException)
-						try {
-							out.writeObject(e.toString());
-						} catch (IOException e1) {
+						try 
+						{
+							//out.writeObject(e.toString());
+							writeObject(socket,e.toString());
+						} 
+						catch (IOException e1) 
+						{
 							break;
 						}
-					else {
-						break;}
-				} catch(ClassNotFoundException e){
-
-				} catch (TrainingDataException e1) {
-					try {
-						out.writeObject(e1.toString());
-					} catch (IOException e) {
+					else 
+						break;
+				} 
+				catch(ClassNotFoundException e)
+				{} 
+				catch (TrainingDataException e1) 
+				{
+					try 
+					{
+						//out.writeObject(e1.toString());
+						writeObject(socket,e1.toString());
+					} 
+					catch (IOException e) 
+					{
 						break;
 					}
 				}
 			}
-		} finally {
-			try {
+		} 
+		finally 
+		{
+			try 
+			{
 				socket.close();
-			} catch (IOException e) {
+			} 
+			catch (IOException e) 
+			{
 				System.out.println("Socket non chiuso!");
 			}
 		}
 	}
 
-	/*
-	private String predictClass(RegressionTree tree)throws UnknownValueException, ClassNotFoundException, IOException{
-		if (tree.getRoot() instanceof LeafNode)
-			return ((LeafNode) tree.getRoot()).getPredictedClassValue();
-		else {
-			int risp;
-			out.writeObject((((SplitNode)tree.getRoot()).formulateQuery()));
-			risp = ((Integer)in.readObject()).intValue();
-			if (risp == -1 || risp>=tree.getRoot().getNumberOfChildren())
-				throw new UnknownValueException();
-			else {
-				return predictClass(tree.subTree(risp));
-			}
-		}
-	}
-	*/
 }
 

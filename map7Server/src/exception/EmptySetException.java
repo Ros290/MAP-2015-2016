@@ -1,4 +1,4 @@
-package database;
+package exception;
 
 public class EmptySetException extends Exception {
 	

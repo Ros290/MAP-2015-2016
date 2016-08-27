@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import exception.EmptySetException;
+
 public class TableData {
 
 	private DbAccess db;
