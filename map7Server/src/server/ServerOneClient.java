@@ -37,86 +37,81 @@ class ServeOneClient extends Thread {
 		out.flush();
 	}
 
-	public void run() {
+	public void run() 
+	{
 		System.out.println("Nuovo client connesso");
-		try {
-			while (true) {
-				try{	
-					String nome = "";
-					//int command = ((Integer)in.readObject()).intValue();
-					int command = ((Integer)readObject(socket)).intValue();
+		String result = "";
+		String nome = "";
+		boolean flag = true;
+		try 
+		{
+			while (flag) 
+			{
+				try
+				{	
+					writeObject(socket,true);
+					String choice1 = "1. Learn Decision Tree :\n";
+					String choice2 = "2. Save Decision Tree (in tree.dat) :\n";
+					String choice3 = "3. Store Decision Tree (from tree.dat) :\n";
+					String choice4 = "4. Use Decision Tree for Prediction :\n";
+					String choice5 = "5. Exit :";
+					writeObject (socket, result + choice1 + choice2 + choice3 + choice4 + choice5);
+					int command = Integer.parseInt((String)readObject(socket));
 					switch(command)
 					{
 					case 1: // LEARNING A REGRESSION TREE
-						//nome = (String)in.readObject();
+						writeObject(socket,true);
+						writeObject(socket,"Inserire il nome della tabella:");
 						nome = (String) readObject (socket);
 						Data trainingSet = new Data(nome);
 						tree = new RegressionTree(trainingSet);
-						//out.writeObject("Acquisito.");
-						writeObject(socket,tree.printRules() + tree.printTree());
+						result = new String (tree.printRules() + tree.printTree());
 						break;
 					case 2: // SERIALIZE THE CURRENT REGRESSION TREE ON A FILE
 						if( tree != null)
 						{
-							writeObject (socket,'T');
-							//nome = (String)in.readObject();
+							writeObject (socket,true);
+							writeObject(socket,"Inserire il nome del file su cui salvare l'albero:");
 							nome = (String)readObject(socket);
 							tree.salva(nome);
-							//out.writeObject("Salvato.");
-							writeObject(socket,"Salvato");
+							result = new String ("Salvato\n");
 						}
 						else
-						{
-							//out.writeObject("false");
-							writeObject(socket,'F');
 							throw new TrainingDataException();
-						}
 						break;
 					case 3: // STORE THE REGRESSION TREE FROM FILE
-						//nome = (String)in.readObject();
+						writeObject(socket,true);
+						writeObject(socket,"Inserire il nome del file da cui caricare l'albero:");
 						nome = (String) readObject(socket);
 						tree = RegressionTree.carica(nome);
-						//out.writeObject("Caricato.");
-						writeObject(socket,tree.printRules() + tree.printTree());
+						result = new String(tree.printRules() + tree.printTree());
 						break;
 					
 					case 4: //USE THE CURRENT TREE TO PREDICT AN EXAMPLE
 						try
 						{
-						if (tree != null)
-						{
-							writeObject (socket, 'T');
-							writeObject(socket,tree.predictClassServer(socket));
-						}
-						else
-						{
-							writeObject(socket,'F');
-							throw new TrainingDataException();
-						}
+							if (tree != null)
+								result = new String ((tree.predictClassServer(socket)).toString() +"\n");
+							else
+								throw new TrainingDataException();
 						}
 						catch (UnknownValueException e)
 						{
-							writeObject(socket,e.toString());
+							result = new String(e.toString());
 						}
+						break;
+					case 5:
+						flag = false;
 						break;
 					default:
 						System.out.println("COMANDO INESISTENTE");
-						//out.writeObject("COMANDO INESISTENTE");
-						writeObject (socket, "COMANDO INESISTENTE");
+						result = new String ("COMANDO INESISTENTE\n");
 					}// END SWITCH
 				} 
 				catch(IOException e)
 				{
 					if (e instanceof FileNotFoundException)
-						try 
-						{
-							//out.writeObject(e.toString());
-							writeObject(socket,e.toString());
-						} 
-						catch (IOException e1) 
-						{
-							break;
-						}
+						result = new String(e.toString());
 					else 
 						break;
 				} 
@@ -124,15 +119,7 @@ class ServeOneClient extends Thread {
 				{} 
 				catch (TrainingDataException e1) 
 				{
-					try 
-					{
-						//out.writeObject(e1.toString());
-						writeObject(socket,e1.toString());
-					} 
-					catch (IOException e) 
-					{
-						break;
-					}
+					result = new String (e1.toString());
 				}
 			}
 		} 
@@ -140,7 +127,9 @@ class ServeOneClient extends Thread {
 		{
 			try 
 			{
+				writeObject(socket,false);
 				socket.close();
+				System.out.println("Server disponbile per un nuovo Client");
 			} 
 			catch (IOException e) 
 			{

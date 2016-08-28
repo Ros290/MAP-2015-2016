@@ -155,84 +155,37 @@ public class MainTest {
 		System.out.println("addr = " + addr);
 		Socket socket = new Socket(addr, MainTest.PORT);
 		System.out.println(socket);
-
-		//ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-		//ObjectInputStream in = new ObjectInputStream(socket.getInputStream());	; // stream con richieste del client
-
-		int scelta;
-
-		do{
-			System.out.println("1. Learn Decision Tree :");
-			System.out.println("2. Save Decision Tree (in tree.dat) :");
-			System.out.println("3. Store Decision Tree (from tree.dat) :");
-			System.out.println("4. Use Decision Tree for Prediction :");
-			System.out.println("5. Exit :");
-			scelta = Keyboard.readInt();
-			Object outputVal=null;
-			String stringa = "";
-			char flag;
-			switch(scelta)
+		
+		/*
+		 * La comunicazione tra Client/Server è molto semplice: si tratta di un "domanda/risposta", nel senso
+		 * che ogni volta il client aspetta di riceve una richiesta dal server, dopo di che digita il comando
+		 * desiderato. Da notare che prima di ricevere la domanda dal server, quest'ultimo deve mandare
+		 * una flag (in questo caso un boolean), quale indica che la connessione è ancora attiva.
+		 * Quindi la socket sarà così strutturata:
+		 * 
+		 * 		-FLAG: indica lo stato della connesione, TRUE se è attiva, altrimenti FALSE (qualora il server debba chiudere la connessione;
+		 * 		
+		 * 		-DOMANDA: generalmente in formato String, mostrera la "domanda" o la "risposta + domanda" (se si nota nel server, 
+		 * 		il risultato di una determinata funzione viene accodata alla domanda successiva da porre al client, questo perchè
+		 * 		il client è strutturato in modo tale che ad ogni messaggio ricevuto, debba corrispondere sempre un'azione da parte 
+		 * 		del client;
+		 *		
+		 *		-RISPOSTA: anch'esso generalmente in formato String, sarà poi compito del server scindere, eventualmente, un eventuale
+		 *		tipo differente dallo string qualora fosse richiesto, solitamente corrisponde ad una opzione richiesta dal client, in 
+		 *		base alle opzioni messe a disposizioni dal server.
+		 */
+		while (true)
+		{
+			//controllo FLAG
+			if (!(boolean)readObject(socket))
 			{
-			case 1:
-				// TO DO
-				//out.writeObject(new Integer(1));
-				writeObject(socket,new Integer(1));
-				System.out.println("Inserire il nome della tabella:");
-				//out.writeObject(Keyboard.readString());
-				writeObject(socket,Keyboard.readString());
-				//outputVal=in.readObject();
-				outputVal = readObject (socket);
+				System.out.println("Connessione terminata\n");
 				break;
-				
-			case 2:
-				//out.writeObject(new Integer(2));
-				writeObject (socket, new Integer (2));
-				flag = (char)readObject(socket);
-				if (flag == 'T')
-				{
-					System.out.println("Inserire il nome del file su cui salvare l'albero:");
-					//out.writeObject(Keyboard.readString());
-					writeObject(socket, Keyboard.readString());
-				}
-				//outputVal=in.readObject();
-				outputVal = readObject (socket);
-				break;
-				
-			case 3:
-				//out.writeObject(new Integer(3));
-				writeObject (socket, new Integer (3));
-				System.out.println("Inserire il nome del file da cui caricare l'albero:");
-				//out.writeObject(Keyboard.readString());
-				writeObject (socket, Keyboard.readString());
-				//outputVal=in.readObject();
-				outputVal = readObject (socket);
-				break;
-				
-			case 4:
-				writeObject (socket, new Integer (4));
-				flag = (char)readObject(socket);
-				if (flag != 'F')
-				{
-					stringa = new String ((String) readObject (socket));
-					while (!stringa.equals("trovato"))
-					{	
-						System.out.println(stringa);
-						writeObject(socket,Keyboard.readInt());
-						stringa = new String ((String) readObject (socket));
-					}
-				}
-				outputVal = readObject (socket);
-				break;
-				
-			case 5:
-				System.out.println("USCITA");
-				System.exit(0);
-				break;
-			default:
-				outputVal=new String("Comando errato.");
 			}
-			System.out.println(outputVal);
+			//stampo il messaggio/risultato/richiesta da parte del server
+			System.out.println((String)readObject(socket));
+			//digito l'opzione che desidero effettuare, o immeto dei dati in particolari
+			writeObject(socket,Keyboard.readString());
 		}
-		while (scelta!=5);	
 	}
 }

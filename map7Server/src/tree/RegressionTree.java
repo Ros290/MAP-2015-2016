@@ -282,7 +282,6 @@ public class RegressionTree implements Serializable
 			if (root instanceof LeafNode)
 			{
 				LeafNode lf = (LeafNode) root;
-				writeObject(socket,"trovato");
 				return lf.predictedClassValue;
 			}
 			//altrimeni è splitNode
@@ -290,8 +289,9 @@ public class RegressionTree implements Serializable
 			{
 				SplitNode sn = (SplitNode) root;
 				//mostro quali sono i percorsi possibili per continuare la predizione
+				writeObject(socket,true);
 				writeObject(socket,sn.formulateQuery());
-				int choice = ((Integer)readObject(socket)).intValue();
+				int choice = Integer.parseInt((String)readObject(socket));
 				if ((choice < 0) || (choice >= childTree.length))
 					throw new UnknownValueException("The answer should be an integer between 0 and "+(childTree.length-1)+"!");
 				//ricevuta la scelta (choice) dall'utente, procedo con la predizione analizzando il figlio scelto
