@@ -67,7 +67,7 @@ public class MultiServer extends Thread{
                 // nessun bisogno di gestire questa eccezione
                   }
             }
-               new MultiServer(port).run();
+               new MultiServer(port);
     }
 
 	}

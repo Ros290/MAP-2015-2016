@@ -1,24 +1,26 @@
 package server;
 
 import java.io.IOException;
-import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import tree.RegressionTree;
 import data.Data;
 import exception.TrainingDataException;
-import exception.UnknownValueException;
-import tree.LeafNode;
-import tree.RegressionTree;
 
 class ServeOneClient extends Thread {
+	
+	private ObjectInputStream in;
+	private ObjectOutputStream out;
 	private Socket socket;
-
+    
 	RegressionTree tree;
 
 	public ServeOneClient(Socket s) throws IOException {
 		socket = s;
+		in = new ObjectInputStream(socket.getInputStream());
+	    out = new ObjectOutputStream(socket.getOutputStream());
 		start();
 	}
 	
@@ -37,11 +39,12 @@ class ServeOneClient extends Thread {
 		out.flush();
 	}
 
-	public void run() 
+	/*public void run() 
 	{
 		System.out.println("Nuovo client connesso");
 		String result = "";
 		String nome = "";
+		Object o;
 		boolean flag = true;
 		try 
 		{
@@ -137,6 +140,62 @@ class ServeOneClient extends Thread {
 			}
 		}
 	}
-
+*/
+	public void run()
+	{
+		String result = "";
+		String nome = "";
+		Object o;
+		boolean flag=true;
+		
+		while (flag) 
+		{
+			try {
+				o = in.readObject();
+				switch((int)o){
+				case 0:	
+					out.writeObject("OK");
+					nome = (String)in.readObject();
+					break;							
+				case 1:
+					nome = (String)in.readObject();
+					result = new String (tree.printRules() + tree.printTree());
+					out.writeObject("OK");
+					out.writeObject(result);
+					break;
+				case 2:
+					if( tree != null){
+						nome = (String)readObject(socket);
+						tree.salva(nome);
+						result = new String ("Salvato\n");
+					} else
+						try {
+							throw new TrainingDataException();
+						} catch (TrainingDataException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				break;
+				case 3:
+					/*	writeObject(socket,true);
+						//writeObject(socket,"Inserire il nome del file da cui caricare l'albero:");
+						nome = (String) readObject(socket);
+						tree = RegressionTree.carica(nome);
+						result = new String(tree.printRules() + tree.printTree());*/
+				break;			
+				}
+			} catch (ClassNotFoundException e) { flag=false;} 
+			  catch (IOException e) { flag=false;} 		
+		}
+		try{
+			socket.close();
+			System.out.println("closing...");
+		} 
+		catch (IOException e) {
+			System.out.println("Socket non chiuso!");
+		}
+	}
 }
+
+
 
