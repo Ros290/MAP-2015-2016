@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.sql.SQLException;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -182,12 +183,15 @@ public class RT extends JApplet {
 			if(answer.equals("OK"))
 			{
 				tab.panelDB.outputMsg.setText((String)in.readObject());
+				System.out.println("FILE SALVATO CORRETTAMENTE!!!");
+				JOptionPane.showMessageDialog(this,"File salvato correttamente!!!");
 				return;
 			}
 			else 
+				System.out.println("SALVATAGGIO SU FILE NON RIUSCITO!!!");
 				tab.panelDB.outputMsg.setText("Regression tree learned!");
 		}
-		catch(IOException | ClassNotFoundException e){
+		catch(IOException | ClassNotFoundException   e){
 			tab.panelDB.outputMsg.setText(e.toString());
 		}
 	}
@@ -197,15 +201,22 @@ public class RT extends JApplet {
 		// TO BE DEFINED
 		try{	
 			tab.panelFile.outputMsg.setText("Working ....");
-			
-			// Storing table from file
+			// store from file
+			System.out.println("Starting learning phase!");
 			out.writeObject(2);
-			out.writeObject(tab.panelFile.tableText.getText());
+			String nomeTab = tab.panelFile.tableText.getText();
+			out.writeObject(nomeTab);
 			String answer=in.readObject().toString();
-			if(!answer.equals("OK")){
-				tab.panelDB.outputMsg.setText((String)in.readObject());	
+			if(answer.equals("OK"))
+			{
+				tab.panelFile.outputMsg.setText((String)in.readObject());
+				System.out.println("FILE CARICATO CORRETTAMENTE");
+				JOptionPane.showMessageDialog(this,"File caricato correttamente!!!");
 				return;
 			}
+			else 
+				System.out.println("CARICAMENTO NON RIUSCITO!!!");
+				tab.panelFile.outputMsg.setText("Regression tree learned!");
 		}
 		catch(IOException | ClassNotFoundException e){
 			tab.panelFile.outputMsg.setText(e.toString());
@@ -214,6 +225,9 @@ public class RT extends JApplet {
 	
 	void startPredictingAction(){
 		try{		
+			
+			
+		
 			tab.panelPredict.startButton.setEnabled(false);
 			out.writeObject(3);
 			System.out.println("Starting prediction phase!");
