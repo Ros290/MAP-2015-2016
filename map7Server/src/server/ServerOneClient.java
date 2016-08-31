@@ -8,6 +8,7 @@ import java.net.Socket;
 import tree.RegressionTree;
 import data.Data;
 import exception.TrainingDataException;
+import exception.UnknownValueException;
 
 class ServeOneClient extends Thread {
 	
@@ -141,6 +142,8 @@ class ServeOneClient extends Thread {
 		}
 	}
 */
+	
+	
 	public void run()
 	{
 		String result = "";
@@ -158,18 +161,18 @@ class ServeOneClient extends Thread {
 					nome = (String)in.readObject();
 					break;							
 				case 1:
+				try{
+					// LEARNING A REGRESSION TREE AND SERIALIZE THE CURRENT REGRESSION TREE ON A FILE
 					nome = (String)in.readObject();
 					Data TrainingSet = new Data(nome);
 					tree = new RegressionTree(TrainingSet);
 					result = new String (tree.printRules() + tree.printTree());
-					out.writeObject("OK");
-					out.writeObject(result);
-					break;
-				case 2:
 					if( tree != null){
-						nome = (String)readObject(socket);
+						try{
 						tree.salva(nome);
-						result = new String ("Salvato\n");
+						}catch (IOException e){
+							out.writeObject("Salvataggio non riuscito");
+						}
 					} else
 						try {
 							throw new TrainingDataException();
@@ -177,28 +180,49 @@ class ServeOneClient extends Thread {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-				break;
-				case 3:
-					/*	writeObject(socket,true);
-						//writeObject(socket,"Inserire il nome del file da cui caricare l'albero:");
-						nome = (String) readObject(socket);
-						tree = RegressionTree.carica(nome);
-						result = new String(tree.printRules() + tree.printTree());*/
-				break;			
+					out.writeObject("OK");
+					out.writeObject(result);
+				}catch (IOException e)
+				{
+				e.printStackTrace();
+				flag=false;
 				}
-			} catch (ClassNotFoundException e) { flag=false;} 
+			
+		
+			break;
+				case 2:
+					// STORE THE REGRESSION TREE FROM FILE
+					nome = (String)in.readObject();
+					tree = RegressionTree.carica(nome);
+					
+					result = new String(tree.printRules() + tree.printTree());
+					out.writeObject("OK");
+					out.writeObject(result);
+					
+							
+				break;	
+					
+				case 3:
+					//USE THE CURRENT TREE TO PREDICT AN EXAMPLE
+					
+					break;
+					
+				}
+			} catch (ClassNotFoundException e) {
+				flag=false;
+				} 
 			  catch (IOException e) { flag=false;}
 			catch (TrainingDataException e) { flag = false;}
 		}
 		try{
 			socket.close();
-			System.out.println("closing...");
+			System.out.println("Server disponbile per un nuovo Client");
 		} 
-		catch (IOException e) {
+		catch (IOException e) 
+		{
 			System.out.println("Socket non chiuso!");
 		}
 	}
 }
-
 
 
