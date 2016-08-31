@@ -140,12 +140,12 @@ public class RT extends JApplet {
 	
 	private ObjectOutputStream out;
 	private ObjectInputStream in ; // stream con richieste del client
-	private TabbedPane tab=new TabbedPane();
+	private TabbedPane tab;
 	
 	public void init()
 	{
 		final int port = 8080;
-		TabbedPane tab=new TabbedPane();
+		tab=new TabbedPane();
 		getContentPane().setLayout(new GridLayout(1,1));
 		getContentPane().add(tab);
 		
@@ -173,21 +173,14 @@ public class RT extends JApplet {
 	void learningFromDBAction(){
 		try{	
 			tab.panelDB.outputMsg.setText("Working ....");
-			
-			// Storing table from db
-			out.writeObject(0);
-			out.writeObject(tab.panelDB.tableText.getText());
-			String answer=in.readObject().toString();
-			if(!answer.equals("OK")){
-				tab.panelDB.outputMsg.setText((String)in.readObject());	
-				return;
-			}
-			
 			// learning tree
 			System.out.println("Starting learning phase!");
 			out.writeObject(1);
-			answer=in.readObject().toString();
-			if(!answer.equals("OK")){
+			String nomeTab = tab.panelDB.tableText.getText();
+			out.writeObject(nomeTab);
+			String answer=in.readObject().toString();
+			if(answer.equals("OK"))
+			{
 				tab.panelDB.outputMsg.setText((String)in.readObject());
 				return;
 			}

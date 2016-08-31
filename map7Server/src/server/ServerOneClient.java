@@ -159,6 +159,8 @@ class ServeOneClient extends Thread {
 					break;							
 				case 1:
 					nome = (String)in.readObject();
+					Data TrainingSet = new Data(nome);
+					tree = new RegressionTree(TrainingSet);
 					result = new String (tree.printRules() + tree.printTree());
 					out.writeObject("OK");
 					out.writeObject(result);
@@ -185,7 +187,8 @@ class ServeOneClient extends Thread {
 				break;			
 				}
 			} catch (ClassNotFoundException e) { flag=false;} 
-			  catch (IOException e) { flag=false;} 		
+			  catch (IOException e) { flag=false;}
+			catch (TrainingDataException e) { flag = false;}
 		}
 		try{
 			socket.close();
