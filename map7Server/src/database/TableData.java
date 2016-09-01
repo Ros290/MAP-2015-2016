@@ -37,7 +37,9 @@ public class TableData {
 			throw new SQLException();
 		query += (" FROM "+table);
 		
-		statement = db.getConnection().createStatement();
+
+		//statement = dbAccess.getConnection().createStatement();
+		statement = DbAccess.getConnection().createStatement();
 		ResultSet rs = statement.executeQuery(query);
 		boolean empty=true;
 		while (rs.next()) {

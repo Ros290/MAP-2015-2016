@@ -59,7 +59,6 @@ public class RT extends JApplet {
 		}
 		
 		private class JPanelPredicting extends JPanel{
-			//TO BE DEFINED
 			private JTextArea queryMsg=new JTextArea(4,50);
 			private JTextField answer=new JTextField(20);
 			private JButton startButton=new JButton("START");
@@ -67,7 +66,6 @@ public class RT extends JApplet {
 			private JLabel predictedClass = new JLabel("");
 			
 			JPanelPredicting( java.awt.event.ActionListener aStart, java.awt.event.ActionListener aContinue){
-				// TO BE DEFINED
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 				JPanel  upPanel=new JPanel();
 				upPanel.setLayout(new FlowLayout());
@@ -78,6 +76,7 @@ public class RT extends JApplet {
 				
 				JPanel  middlePanel=new JPanel();
 				middlePanel.setLayout(new FlowLayout());
+				middlePanel.add(new JLabel("Choise:"));
 				middlePanel.add(answer);
 				startButton.addActionListener(aStart);
 				executeButton.addActionListener(aContinue);
@@ -86,9 +85,7 @@ public class RT extends JApplet {
 				add(middlePanel);
 				
 				JPanel  downPanel=new JPanel();
-				//downPanel.setLayout(new GridLayout(1,1));
 				downPanel.setLayout(new FlowLayout());
-				downPanel.add(new JLabel("predictedClass:"));
 				add(downPanel);	
 			}
 		}
@@ -98,7 +95,7 @@ public class RT extends JApplet {
 			super(new GridLayout(1, 1)); 
 			JTabbedPane tabbedPane = new JTabbedPane();
 			//copy img in src Directory and bin directory
-			//java.net.URL imgURL = getClass().getResource("img/db.jpg");
+			java.net.URL imgURL = getClass().getResource("img/db.jpg");
 			ImageIcon iconDB = new ImageIcon("DB");
 			panelDB = new JPanelLearning(new java.awt.event.ActionListener() {
 				@Override
@@ -108,7 +105,7 @@ public class RT extends JApplet {
 		      });
 	        tabbedPane.addTab("DB", iconDB, panelDB, "Does nothing");
 	      
-	        //imgURL = getClass().getResource("img/file.jpg");
+	        imgURL = getClass().getResource("img/file.jpg");
 	        ImageIcon iconFile = new ImageIcon("FILE");
 			panelFile = new JPanelLearning(new java.awt.event.ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -117,7 +114,7 @@ public class RT extends JApplet {
 		      });
 	        tabbedPane.addTab("FILE", iconFile, panelFile, "Does nothing");
 	        
-	        //imgURL = getClass().getResource("img/predict.jpg");
+	        imgURL = getClass().getResource("img/predizione.jpg");
 	        ImageIcon iconPredict = new ImageIcon("PREDICT");
 			panelPredict = new JPanelPredicting(new java.awt.event.ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -198,7 +195,6 @@ public class RT extends JApplet {
 	
 	
 	void learningFromFileAction(){
-		// TO BE DEFINED
 		try{	
 			tab.panelFile.outputMsg.setText("Working ....");
 			// store from file
@@ -225,9 +221,6 @@ public class RT extends JApplet {
 	
 	void startPredictingAction(){
 		try{		
-			
-			
-		
 			tab.panelPredict.startButton.setEnabled(false);
 			out.writeObject(3);
 			System.out.println("Starting prediction phase!");
@@ -261,8 +254,38 @@ public class RT extends JApplet {
 		}
 	}
 	
-	/*
+	
 	void continuePredictingAction(){
-		//TO BE DEFINED
-	}*/
+		//TO BE DEFINED		
+		try{		
+			out.writeObject(new Integer(tab.panelPredict.answer.getText()));
+			System.out.println("Continuing prediction phase!");
+			String answer=in.readObject().toString();
+			
+			if(answer.equals("QUERY")){
+				answer=in.readObject().toString();
+				tab.panelPredict.queryMsg.setText(answer);
+				tab.panelPredict.executeButton.setEnabled(true);
+				tab.panelPredict.startButton.setEnabled(false);
+			}
+			else
+			if(answer.equals("OK")){ 
+				answer=in.readObject().toString();
+				tab.panelPredict.predictedClass.setText("Predicted class:"+answer);
+				tab.panelPredict.queryMsg.setText("");
+				tab.panelPredict.startButton.setEnabled(false);
+				tab.panelPredict.executeButton.setEnabled(true);
+			}
+			else {
+				//Printing error message
+				tab.panelPredict.queryMsg.setText(answer);
+				tab.panelPredict.startButton.setEnabled(false);
+				tab.panelPredict.executeButton.setEnabled(true);
+			}
+		}
+		catch(IOException | ClassNotFoundException e){
+			tab.panelPredict.queryMsg.setText(e.toString());
+		}
+		
+	}
 }
