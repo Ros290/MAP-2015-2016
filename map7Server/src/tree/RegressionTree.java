@@ -274,7 +274,7 @@ public class RegressionTree implements Serializable
 			out.flush();
 		}
 		
-		public Double predictClassServer(Socket socket) throws UnknownValueException
+		public Double predictClass(Socket socket) throws UnknownValueException
 		{
 			try
 			{
@@ -282,6 +282,7 @@ public class RegressionTree implements Serializable
 			if (root instanceof LeafNode)
 			{
 				LeafNode lf = (LeafNode) root;
+				writeObject(socket,"OK");
 				return lf.predictedClassValue;
 			}
 			//altrimeni è splitNode
@@ -289,13 +290,14 @@ public class RegressionTree implements Serializable
 			{
 				SplitNode sn = (SplitNode) root;
 				//mostro quali sono i percorsi possibili per continuare la predizione
-				writeObject(socket,true);
+				writeObject(socket,"QUERY");
 				writeObject(socket,sn.formulateQuery());
-				int choice = Integer.parseInt((String)readObject(socket));
+				//int choice = Integer.parseInt((String)readObject(socket));
+				int choice = (int)readObject(socket);
 				if ((choice < 0) || (choice >= childTree.length))
 					throw new UnknownValueException("The answer should be an integer between 0 and "+(childTree.length-1)+"!");
 				//ricevuta la scelta (choice) dall'utente, procedo con la predizione analizzando il figlio scelto
-				return childTree[choice].predictClassServer(socket);
+				return childTree[choice].predictClass(socket);
 			}
 			}
 			catch (IOException e)

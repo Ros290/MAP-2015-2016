@@ -26,6 +26,21 @@ public class RT extends JApplet {
 
 	private static final long serialVersionUID = 1L;
 	
+	protected static Object readObject(Socket socket) throws ClassNotFoundException, IOException
+	{
+		Object o;
+		ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+		o = in.readObject();
+		return o;
+	}
+	
+	protected static void writeObject(Socket socket, Object o) throws IOException
+	{
+		ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+		out.writeObject(o);
+		out.flush();
+	}
+	
 	private class TabbedPane extends JPanel{
 		 private JPanelLearning panelDB;
 		 private JPanelLearning panelFile;
@@ -123,7 +138,7 @@ public class RT extends JApplet {
 		      },
 			new java.awt.event.ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-						//continuePredictingAction();		
+						continuePredictingAction();		
 				}
 			});
 	        tabbedPane.addTab("PREDICT", iconPredict, panelPredict, "Does nothing");
@@ -138,6 +153,7 @@ public class RT extends JApplet {
 	
 	private ObjectOutputStream out;
 	private ObjectInputStream in ; // stream con richieste del client
+	private Socket socket;
 	private TabbedPane tab;
 	
 	public void init()
@@ -157,7 +173,7 @@ public class RT extends JApplet {
 		{
 		InetAddress addr = InetAddress.getByName(ip); //ip
 		System.out.println("addr = " + addr);
-		Socket socket = new Socket(addr, port); //Port
+		socket = new Socket(addr, port); //Port
 		System.out.println(socket);
 		
 		out = new ObjectOutputStream(socket.getOutputStream());
@@ -173,13 +189,13 @@ public class RT extends JApplet {
 			tab.panelDB.outputMsg.setText("Working ....");
 			// learning tree
 			System.out.println("Starting learning phase!");
-			out.writeObject(1);
+			writeObject(socket,1);
 			String nomeTab = tab.panelDB.tableText.getText();
-			out.writeObject(nomeTab);
-			String answer=in.readObject().toString();
+			writeObject(socket,nomeTab);
+			String answer=readObject(socket).toString();
 			if(answer.equals("OK"))
 			{
-				tab.panelDB.outputMsg.setText((String)in.readObject());
+				tab.panelDB.outputMsg.setText((String)readObject(socket));
 				System.out.println("FILE SALVATO CORRETTAMENTE!!!");
 				JOptionPane.showMessageDialog(this,"File salvato correttamente!!!");
 				return;
@@ -199,13 +215,13 @@ public class RT extends JApplet {
 			tab.panelFile.outputMsg.setText("Working ....");
 			// store from file
 			System.out.println("Starting learning phase!");
-			out.writeObject(2);
+			writeObject(socket,2);
 			String nomeTab = tab.panelFile.tableText.getText();
-			out.writeObject(nomeTab);
-			String answer=in.readObject().toString();
+			writeObject(socket,nomeTab);
+			String answer=readObject(socket).toString();
 			if(answer.equals("OK"))
 			{
-				tab.panelFile.outputMsg.setText((String)in.readObject());
+				tab.panelFile.outputMsg.setText((String)readObject(socket));
 				System.out.println("FILE CARICATO CORRETTAMENTE");
 				JOptionPane.showMessageDialog(this,"File caricato correttamente!!!");
 				return;
@@ -222,21 +238,21 @@ public class RT extends JApplet {
 	void startPredictingAction(){
 		try{		
 			tab.panelPredict.startButton.setEnabled(false);
-			out.writeObject(3);
+			writeObject(socket,3);
 			System.out.println("Starting prediction phase!");
-			String answer=in.readObject().toString();
+			String answer=readObject(socket).toString();
 			
 			
 			if(answer.equals("QUERY")){
 				// Formualting query, reading answer
-				answer=in.readObject().toString();
+				answer=readObject(socket).toString();
 				tab.panelPredict.queryMsg.setText(answer);
 				tab.panelPredict.executeButton.setEnabled(true);
 			}
 			else
 			if(answer.equals("OK")){ 
 				// Reading prediction
-				answer=in.readObject().toString();
+				answer=readObject(socket).toString();
 				tab.panelPredict.predictedClass.setText("Predicted class:"+answer);
 				tab.panelPredict.queryMsg.setText("");
 				tab.panelPredict.startButton.setEnabled(true);
@@ -251,6 +267,8 @@ public class RT extends JApplet {
 		}
 		catch(IOException | ClassNotFoundException e){
 			tab.panelPredict.queryMsg.setText(e.toString());
+			tab.panelPredict.startButton.setEnabled(true);
+			tab.panelPredict.executeButton.setEnabled(false);
 		}
 	}
 	
@@ -258,23 +276,23 @@ public class RT extends JApplet {
 	void continuePredictingAction(){
 		//TO BE DEFINED		
 		try{		
-			out.writeObject(new Integer(tab.panelPredict.answer.getText()));
+			writeObject(socket,new Integer(tab.panelPredict.answer.getText()));
 			System.out.println("Continuing prediction phase!");
-			String answer=in.readObject().toString();
+			String answer=readObject(socket).toString();
 			
 			if(answer.equals("QUERY")){
-				answer=in.readObject().toString();
+				answer=readObject(socket).toString();
 				tab.panelPredict.queryMsg.setText(answer);
 				tab.panelPredict.executeButton.setEnabled(true);
 				tab.panelPredict.startButton.setEnabled(false);
 			}
 			else
 			if(answer.equals("OK")){ 
-				answer=in.readObject().toString();
+				answer=readObject(socket).toString();
 				tab.panelPredict.predictedClass.setText("Predicted class:"+answer);
 				tab.panelPredict.queryMsg.setText("");
-				tab.panelPredict.startButton.setEnabled(false);
-				tab.panelPredict.executeButton.setEnabled(true);
+				tab.panelPredict.startButton.setEnabled(true);
+				tab.panelPredict.executeButton.setEnabled(false);
 			}
 			else {
 				//Printing error message
