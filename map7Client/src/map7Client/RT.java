@@ -101,6 +101,7 @@ public class RT extends JApplet {
 				
 				JPanel  downPanel=new JPanel();
 				downPanel.setLayout(new FlowLayout());
+				downPanel.add(predictedClass);
 				add(downPanel);	
 			}
 		}
