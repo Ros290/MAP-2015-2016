@@ -1,14 +1,10 @@
 package data;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 
 import database.DbAccess;
@@ -32,13 +28,13 @@ public class Data implements Serializable
 	private List<Attribute> explanatorySet = new LinkedList<Attribute>();
 	private ContinuousAttribute classAttribute;
 	
-	public Data(String tableName)throws FileNotFoundException, TrainingDataException
+	public Data(String tableName)throws FileNotFoundException, TrainingDataException, ClassNotFoundException, DatabaseConnectionException, SQLException, EmptySetException
 	{
 		int i;
 		DbAccess db = new DbAccess();
 		TableData td = new TableData (db);
-		try 
-		{
+		
+		
 			db.initConnection();
 			TableSchema ts = new TableSchema (db, tableName);
 			this.data = td.getTransazioni(tableName);
@@ -55,27 +51,8 @@ public class Data implements Serializable
 			}
 			this.classAttribute = new ContinuousAttribute (ts.getColumn(i).getColumnName(),i);
 			
-		} 
-		catch (ClassNotFoundException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		catch (DatabaseConnectionException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		catch (SQLException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		catch (EmptySetException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		
 		
 	/*
@@ -149,7 +126,7 @@ public class Data implements Serializable
 	      }
 		  sc.close();
 	*/
-	}
+	
 	
 	/**
 	 *Ritorna , in formato stringa, tutto il contenuto di Data

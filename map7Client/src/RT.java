@@ -1,4 +1,4 @@
-package map7Client;
+
 
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -8,7 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.sql.SQLException;
+import java.rmi.ServerException;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -112,17 +112,20 @@ public class RT extends JApplet {
 			JTabbedPane tabbedPane = new JTabbedPane();
 			//copy img in src Directory and bin directory
 			java.net.URL imgURL = getClass().getResource("img/db.jpg");
-			ImageIcon iconDB = new ImageIcon("DB");
+			ImageIcon iconDB = new ImageIcon(imgURL);
 			panelDB = new JPanelLearning(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					
 					learningFromDBAction();
+					 
+					
 				}
 		      });
-	        tabbedPane.addTab("DB", iconDB, panelDB, "Does nothing");
+	        tabbedPane.addTab("DB", iconDB, panelDB);
 	      
 	        imgURL = getClass().getResource("img/file.jpg");
-	        ImageIcon iconFile = new ImageIcon("FILE");
+	        ImageIcon iconFile = new ImageIcon(imgURL);
 			panelFile = new JPanelLearning(new java.awt.event.ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 						learningFromFileAction();
@@ -131,7 +134,7 @@ public class RT extends JApplet {
 	        tabbedPane.addTab("FILE", iconFile, panelFile, "Does nothing");
 	        
 	        imgURL = getClass().getResource("img/predizione.jpg");
-	        ImageIcon iconPredict = new ImageIcon("PREDICT");
+	        ImageIcon iconPredict = new ImageIcon(imgURL);
 			panelPredict = new JPanelPredicting(new java.awt.event.ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 						startPredictingAction();
@@ -198,12 +201,13 @@ public class RT extends JApplet {
 			{
 				tab.panelDB.outputMsg.setText((String)readObject(socket));
 				System.out.println("FILE SALVATO CORRETTAMENTE!!!");
-				JOptionPane.showMessageDialog(this,"File salvato correttamente!!!");
+				JOptionPane.showMessageDialog(this,"Caricamento da DB e salvataggio su file effettuati correttamente!!!");
 				return;
 			}
 			else 
 				System.out.println("SALVATAGGIO SU FILE NON RIUSCITO!!!");
 				tab.panelDB.outputMsg.setText("Regression tree learned!");
+				JOptionPane.showMessageDialog(this,"TABELLA INESISTENTE!\n"+"Inserire nuovamente il nome della tabella");
 		}
 		catch(IOException | ClassNotFoundException   e){
 			tab.panelDB.outputMsg.setText(e.toString());
@@ -228,8 +232,9 @@ public class RT extends JApplet {
 				return;
 			}
 			else 
+				
 				System.out.println("CARICAMENTO NON RIUSCITO!!!");
-				tab.panelFile.outputMsg.setText("Regression tree learned!");
+			   	tab.panelFile.outputMsg.setText("Regression tree learned!");
 		}
 		catch(IOException | ClassNotFoundException e){
 			tab.panelFile.outputMsg.setText(e.toString());
