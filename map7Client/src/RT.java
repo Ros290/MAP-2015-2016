@@ -3,6 +3,8 @@
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,6 +16,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -49,7 +52,8 @@ public class RT extends JApplet {
 		private class JPanelLearning extends JPanel{
 			private JTextField tableText=new JTextField(20);
 			private JTextArea outputMsg=new JTextArea();
-			private JButton executeButton=new JButton("LEARN");;
+			private JButton executeButton=new JButton("LEARN");
+			private JButton saveButton=new JButton("SAVE ON PDF");
 			
 			JPanelLearning( java.awt.event.ActionListener a){
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
@@ -58,8 +62,10 @@ public class RT extends JApplet {
 				upPanel.add(new JLabel("Table:"));
 				upPanel.add(tableText);
 				executeButton.addActionListener(a);
+				saveButton.addActionListener(a);
 				
 				upPanel.add(executeButton);
+				upPanel.add(saveButton);
 				add(upPanel);
 				
 				JPanel  bottomPanel=new JPanel();
@@ -67,11 +73,10 @@ public class RT extends JApplet {
 				outputMsg.setEditable(false);
 				JScrollPane scrollingArea = new JScrollPane(outputMsg);
 				bottomPanel.add(scrollingArea);
-				add(bottomPanel);
-				
-				
+				add(bottomPanel);	
 			}
 		}
+		
 		
 		private class JPanelPredicting extends JPanel{
 			private JTextArea queryMsg=new JTextArea(4,50);
@@ -116,10 +121,7 @@ public class RT extends JApplet {
 			panelDB = new JPanelLearning(new java.awt.event.ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					
 					learningFromDBAction();
-					 
-					
 				}
 		      });
 	        tabbedPane.addTab("DB", iconDB, panelDB);
@@ -189,9 +191,10 @@ public class RT extends JApplet {
 	}
 	
 	void learningFromDBAction(){
-		try{	
+		try{
 			tab.panelDB.outputMsg.setText("Working ....");
-			// learning tree
+			tab.panelDB.saveButton.setEnabled(true);
+			// learning tree		
 			System.out.println("Starting learning phase!");
 			writeObject(socket,1);
 			String nomeTab = tab.panelDB.tableText.getText();
@@ -205,13 +208,45 @@ public class RT extends JApplet {
 				return;
 			}
 			else 
+			{
 				System.out.println("SALVATAGGIO SU FILE NON RIUSCITO!!!");
-				tab.panelDB.outputMsg.setText("Regression tree learned!");
+				//tab.panelDB.outputMsg.setText("Regression tree learned!");
+				tab.panelDB.outputMsg.setText("Errore! - Database non trovato!\n Reinserire il nome della tabella da apprendere");
 				JOptionPane.showMessageDialog(this,"TABELLA INESISTENTE!\n"+"Inserire nuovamente il nome della tabella");
+			}
 		}
 		catch(IOException | ClassNotFoundException   e){
 			tab.panelDB.outputMsg.setText(e.toString());
 		}
+		
+		/*
+		try{
+			tab.panelDB.saveButton.setEnabled(false);
+			JButton b=(JButton).getSource();
+			if(b.getText()=="SALVA SU PDF") {			
+				String dest=panelDB.fc.getSelectedFile().getAbsolutePath()+".pdf";
+			File file = new File(dest);
+			file.getParentFile().mkdirs();
+			Document document = new Document();
+			try {
+				PdfWriter.getInstance(document, new FileOutputStream(dest));
+			} catch (DocumentException e1) {
+				e1.printStackTrace();
+			}
+			com.itextpdf.text.Rectangle two = new com.itextpdf.text.Rectangle(700,400);
+						        
+			document.open();
+			Paragraph p = new Paragraph("Tabella: "+panelDB.tableText.getText()";
+			p.add(new Paragraph(" "));
+			try {
+				document.add(p);
+			} catch (DocumentException e1) {
+				e1.printStackTrace();
+			}			        			               
+			document.close();			        
+			System.out.println("Pdf salvato correttamente....");
+			JOptionPane.showMessageDialog(panelDB, "Pdf salvato correttamente!!!");	
+		*/
 	}
 	
 	
@@ -232,18 +267,22 @@ public class RT extends JApplet {
 				return;
 			}
 			else 
-				
-				System.out.println("CARICAMENTO NON RIUSCITO!!!");
-			   	tab.panelFile.outputMsg.setText("Regression tree learned!");
+			{
+				System.out.println("CARICAMENTO DA FILE NON RIUSCITO!!!");
+			   	//tab.panelFile.outputMsg.setText("Regression tree learned!");
+				tab.panelFile.outputMsg.setText("Errore! - File inesistente!\n Reinseirire il nome del file da caricare");
+				JOptionPane.showMessageDialog(this,"FILE INESISTENTE!\n"+"Inserire nuovamente il nome del file");
+			}
 		}
 		catch(IOException | ClassNotFoundException e){
 			tab.panelFile.outputMsg.setText(e.toString());
 		}
 	}
 	
+	
 	void startPredictingAction(){
 		try{		
-			tab.panelPredict.startButton.setEnabled(false);
+			tab.panelPredict.startButton.setEnabled(false);			
 			writeObject(socket,3);
 			System.out.println("Starting prediction phase!");
 			String answer=readObject(socket).toString();

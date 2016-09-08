@@ -60,58 +60,53 @@ class ServeOneClient extends Thread {
 					writeObject(socket,"OK");
 					nome = (String)readObject(socket);
 					break;							
+				
 				case 1:
+					// LEARNING A REGRESSION TREE AND SERIALIZE THE CURRENT REGRESSION TREE ON A FILE
 					try{					
 						nome = (String)readObject(socket);
 						Data TrainingSet = new Data(nome);	
 						tree = new RegressionTree(TrainingSet);
 						writeObject(socket,"OK");
 						result = new String (tree.printRules() + tree.printTree());
-						
-					}catch (SQLException e)
-					{
-						
-					System.out.println("La tabella non esiste");
 					} 
-				catch (EmptySetException e) 
-					{
-					
-					System.out.println("ResultSet vuoto!!!");
+					catch (SQLException e){
+						System.out.println("La tabella non esiste");
+					} 
+					catch (EmptySetException e){	
+						System.out.println("ResultSet vuoto!!!");
 					}	 
-				catch (DatabaseConnectionException e)
-					{
-					
-					System.out.println("Errore di connessione al database");
+					catch (DatabaseConnectionException e){
+						System.out.println("Errore di connessione al database");
 					} 
-				catch (TrainingDataException e) {
-					
-					System.out.println("Impossibile trovare il file specificato");
-				} 
+					catch (TrainingDataException e) {
+						System.out.println("Impossibile trovare il file specificato");
+					} 
 															
-					
-					if( tree != null)
-						{
+					if( tree != null) {
 						tree.salva(nome);
-						 System.out.println("Salvataggio su file riuscito correttamente!!!");
-						}	
-					else
-					{
-					 System.out.println("Salvataggio su file non riuscito!!!");
+						System.out.println("Salvataggio su file riuscito correttamente!!!");
 					}	
+					else
+						System.out.println("Salvataggio su file non riuscito!!!");
 			
-					
 					writeObject(socket,result);
-		
 			       break;
+				
 				case 2:
-					nome = (String)readObject(socket);
-					tree = RegressionTree.carica(nome);
-					System.out.println("Caricamento da file riuscito correttamente!!!");
-					result = new String(tree.printRules() + tree.printTree());
-					writeObject(socket,"OK"); 
-					writeObject(socket,result);
+					// STORE THE REGRESSION TREE FROM FILE
+					try{
+						nome = (String)readObject(socket);
+						tree = RegressionTree.carica(nome);
+						System.out.println("Caricamento da file riuscito correttamente!!!");
+						writeObject(socket,"OK"); 
+						result = new String(tree.printRules() + tree.printTree());
+					}
+					catch(IOException e){
+						out.writeObject("Caricamento non riuscito");
+					}
 					
-							
+					writeObject(socket,result);
 				break;	
 					
 				case 3:

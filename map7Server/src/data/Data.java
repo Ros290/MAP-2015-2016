@@ -34,8 +34,8 @@ public class Data implements Serializable
 		DbAccess db = new DbAccess();
 		TableData td = new TableData (db);
 		
-		
-			db.initConnection();
+			//db.initConnection();
+			DbAccess.initConnection();
 			TableSchema ts = new TableSchema (db, tableName);
 			this.data = td.getTransazioni(tableName);
 			this.numberOfExamples = data.size();
@@ -50,8 +50,7 @@ public class Data implements Serializable
 				}
 			}
 			this.classAttribute = new ContinuousAttribute (ts.getColumn(i).getColumnName(),i);
-			
-		}
+	}
 		
 		
 		
@@ -228,10 +227,8 @@ public class Data implements Serializable
 			*/
 			temp=data.get(i);
 			data.set(i, data.get(j));
-			data.set(j,temp);
-			
+			data.set(j,temp);	
 		}
-		
 	}
 	
 
@@ -271,7 +268,6 @@ public class Data implements Serializable
 		}
 		swap(inf,j);
 		return j;
-
 	}
 	
 	/*
@@ -296,10 +292,7 @@ public class Data implements Serializable
 			{
 				quicksort(attribute, pos+1, sup); 
 				quicksort(attribute, inf, pos-1);
-			}
-			
-			
+			}	
 		}
-		
 	}
 }
