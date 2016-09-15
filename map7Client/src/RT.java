@@ -3,7 +3,9 @@
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -11,7 +13,10 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.rmi.ServerException;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JApplet;
@@ -24,6 +29,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.imageio.ImageIO;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.xobject.PDPixelMap;
+import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 
 public class RT extends JApplet {
 
@@ -55,14 +70,14 @@ public class RT extends JApplet {
 			private JButton executeButton=new JButton("LEARN");
 			private JButton saveButton=new JButton("SAVE ON PDF");
 			
-			JPanelLearning( java.awt.event.ActionListener a){
+			JPanelLearning( java.awt.event.ActionListener aLearn, java.awt.event.ActionListener aSave){
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 				JPanel  upPanel=new JPanel();
 				upPanel.setLayout(new FlowLayout());
 				upPanel.add(new JLabel("Table:"));
 				upPanel.add(tableText);
-				executeButton.addActionListener(a);
-				saveButton.addActionListener(a);
+				executeButton.addActionListener(aLearn);
+				saveButton.addActionListener(aSave);
 				
 				upPanel.add(executeButton);
 				upPanel.add(saveButton);
@@ -123,7 +138,12 @@ public class RT extends JApplet {
 				public void actionPerformed(ActionEvent e) {
 					learningFromDBAction();
 				}
-		      });
+		      },
+				new java.awt.event.ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+							printingToPDF(panelDB);		
+					}
+				});
 	        tabbedPane.addTab("DB", iconDB, panelDB);
 	      
 	        imgURL = getClass().getResource("img/file.jpg");
@@ -132,7 +152,12 @@ public class RT extends JApplet {
 				public void actionPerformed(ActionEvent e) {
 						learningFromFileAction();
 				}
-		      });
+		      },
+				new java.awt.event.ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+							printingToPDF(panelFile);		
+					}
+				});
 	        tabbedPane.addTab("FILE", iconFile, panelFile, "Does nothing");
 	        
 	        imgURL = getClass().getResource("img/predizione.jpg");
@@ -350,5 +375,94 @@ public class RT extends JApplet {
 			tab.panelPredict.queryMsg.setText(e.toString());
 		}
 		
+	}
+	
+	void printingToPDF (RT.TabbedPane.JPanelLearning panel)
+	{
+		try
+		{
+			
+			String table = panel.tableText.getText();
+			String text = "";
+			//String img = "";
+			if (((Object)panel).equals(((Object)tab.panelDB)))
+			{
+				learningFromDBAction();
+				text = tab.panelDB.outputMsg.getText();
+			}
+			else
+			{
+				
+				learningFromFileAction();
+				text = tab.panelFile.outputMsg.getText();
+			}
+	        PDDocument doc = new PDDocument();
+	        PDPage page = new PDPage();
+	        doc.addPage(page);
+	        PDPageContentStream contentStream = new PDPageContentStream(doc, page);
+
+	        PDFont pdfFont = PDType1Font.HELVETICA;
+	        float fontSize = 12;
+	        float leading = 1.5f * fontSize;
+
+	        PDRectangle mediabox = page.findMediaBox();
+	        float margin = 72;
+	        float startX = mediabox.getLowerLeftX() + margin/2;
+	        float startY = mediabox.getUpperRightY() - margin;
+			float center = mediabox.getWidth() /2.0f;
+
+	        List<String> lines = new ArrayList<String>();
+	        int lastSpace = -1;
+	        while (text.length() > 0)
+	        {
+	            int spaceIndex = text.indexOf('\n');
+	            if (spaceIndex < 0)
+	            {
+	                lines.add(text);
+	                text = "";
+	            }
+	            else
+	            {
+	                String subString = text.substring(0, spaceIndex);
+					if (lastSpace < 0)
+						lastSpace = spaceIndex;
+					else
+						lastSpace = spaceIndex;
+					lines.add(subString);
+					text = text.substring(lastSpace).trim();
+					lastSpace = -1;
+	            }
+	        }
+
+	        contentStream.beginText();
+	        contentStream.setFont(pdfFont, fontSize);
+	        contentStream.moveTextPositionByAmount(startX, startY + margin - center);
+	        for (String line: lines)
+	        {
+	            contentStream.drawString(line);
+	            contentStream.moveTextPositionByAmount(0, -leading);
+	        }
+	        contentStream.endText(); 
+
+			/*
+			try 
+			{
+				File f = new File (img);
+				BufferedImage awtImage = ImageIO.read(f);
+				PDXObjectImage ximage = new PDPixelMap(doc, awtImage);
+				float scale = 0.5f; // alter this value to set the image size
+	        	contentStream.drawXObject(ximage, 100, 400, ximage.getWidth()*scale, ximage.getHeight()*scale);
+			} 
+	    
+			catch (FileNotFoundException fnfex) 
+			{
+				System.out.println("No image for you");
+			}
+			*/
+			contentStream.close();
+			doc.save(table + ".pdf");
+			doc.close();
+		}
+		catch (Exception e) {}
 	}
 }
