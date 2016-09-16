@@ -29,6 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.imageio.ImageIO;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -78,6 +79,7 @@ public class RT extends JApplet {
 				upPanel.add(tableText);
 				executeButton.addActionListener(aLearn);
 				saveButton.addActionListener(aSave);
+				saveButton.setEnabled(false);
 				
 				upPanel.add(executeButton);
 				upPanel.add(saveButton);
@@ -140,8 +142,29 @@ public class RT extends JApplet {
 				}
 		      },
 				new java.awt.event.ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-							printingToPDF(panelDB);		
+					public void actionPerformed(ActionEvent e) 
+					{
+							JFileChooser fileChooser = new JFileChooser();
+							fileChooser.setMultiSelectionEnabled(false);
+							fileChooser.setFileFilter(new FileNameExtensionFilter("PDF file", "pdf"));
+
+							if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) 
+							{
+								File file = fileChooser.getSelectedFile();
+								String fileName = file.getName();
+								int i = fileName.indexOf('.');
+								try 
+								{
+									if (i >= 0 && fileName.substring(i + 1).equalsIgnoreCase("pdf"))
+										PDFcreator(file.getAbsolutePath(), tab.panelDB.outputMsg.getText());
+									else
+										PDFcreator(file.getAbsolutePath() + ".pdf", tab.panelDB.outputMsg.getText());
+								} 
+								catch (Exception e1) 
+								{
+									e1.printStackTrace();
+								}
+							}	
 					}
 				});
 	        tabbedPane.addTab("DB", iconDB, panelDB);
@@ -154,8 +177,30 @@ public class RT extends JApplet {
 				}
 		      },
 				new java.awt.event.ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-							printingToPDF(panelFile);		
+					public void actionPerformed(ActionEvent e) 
+					{
+							JFileChooser fileChooser = new JFileChooser();
+							fileChooser.setMultiSelectionEnabled(false);
+							fileChooser.setFileFilter(new FileNameExtensionFilter("PDF file", "pdf"));
+
+							if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) 
+							{
+								File file = fileChooser.getSelectedFile();
+								String fileName = file.getName();
+								int i = fileName.indexOf('.');
+								try 
+								{
+									if (i >= 0 && fileName.substring(i + 1).equalsIgnoreCase("pdf"))
+										PDFcreator(file.getAbsolutePath(), tab.panelFile.outputMsg.getText());
+									else
+										PDFcreator(file.getAbsolutePath() + ".pdf", tab.panelFile.outputMsg.getText());
+								} 
+								catch (Exception e1) 
+								{
+									e1.printStackTrace();
+								}
+							}
+						
 					}
 				});
 	        tabbedPane.addTab("FILE", iconFile, panelFile, "Does nothing");
@@ -230,6 +275,7 @@ public class RT extends JApplet {
 				tab.panelDB.outputMsg.setText((String)readObject(socket));
 				System.out.println("FILE SALVATO CORRETTAMENTE!!!");
 				JOptionPane.showMessageDialog(this,"Caricamento da DB e salvataggio su file effettuati correttamente!!!");
+				tab.panelDB.saveButton.setEnabled(true);
 				return;
 			}
 			else 
@@ -289,6 +335,7 @@ public class RT extends JApplet {
 				tab.panelFile.outputMsg.setText((String)readObject(socket));
 				System.out.println("FILE CARICATO CORRETTAMENTE");
 				JOptionPane.showMessageDialog(this,"File caricato correttamente!!!");
+				tab.panelFile.saveButton.setEnabled(true);
 				return;
 			}
 			else 
@@ -377,25 +424,11 @@ public class RT extends JApplet {
 		
 	}
 	
-	void printingToPDF (RT.TabbedPane.JPanelLearning panel)
+	void PDFcreator (String title, String text)
 	{
 		try
 		{
 			
-			String table = panel.tableText.getText();
-			String text = "";
-			//String img = "";
-			if (((Object)panel).equals(((Object)tab.panelDB)))
-			{
-				learningFromDBAction();
-				text = tab.panelDB.outputMsg.getText();
-			}
-			else
-			{
-				
-				learningFromFileAction();
-				text = tab.panelFile.outputMsg.getText();
-			}
 	        PDDocument doc = new PDDocument();
 	        PDPage page = new PDPage();
 	        doc.addPage(page);
@@ -460,8 +493,9 @@ public class RT extends JApplet {
 			}
 			*/
 			contentStream.close();
-			doc.save(table + ".pdf");
+			doc.save(title);
 			doc.close();
+			JOptionPane.showMessageDialog(this,"File PDF salvato correttamente!!!");
 		}
 		catch (Exception e) {}
 	}
