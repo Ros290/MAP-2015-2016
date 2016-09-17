@@ -156,9 +156,10 @@ public class RT extends JApplet {
 								try 
 								{
 									if (i >= 0 && fileName.substring(i + 1).equalsIgnoreCase("pdf"))
-										PDFcreator(file.getAbsolutePath(), tab.panelDB.outputMsg.getText());
+										PDFcreator(file.getAbsolutePath(),tab.panelDB.outputMsg.getText());
+									
 									else
-										PDFcreator(file.getAbsolutePath() + ".pdf", tab.panelDB.outputMsg.getText());
+										PDFcreator(file.getAbsolutePath() + ".pdf","NOME TABELLA:   "+ tab.panelDB.tableText.getText() + "\n" + tab.panelDB.outputMsg.getText());
 								} 
 								catch (Exception e1) 
 								{
@@ -192,17 +193,21 @@ public class RT extends JApplet {
 								{
 									if (i >= 0 && fileName.substring(i + 1).equalsIgnoreCase("pdf"))
 										PDFcreator(file.getAbsolutePath(), tab.panelFile.outputMsg.getText());
+									
 									else
-										PDFcreator(file.getAbsolutePath() + ".pdf", tab.panelFile.outputMsg.getText());
+										PDFcreator(file.getAbsolutePath() + ".pdf", "NOME TABELLA:   "+ tab.panelFile.tableText.getText() + "\n" + tab.panelFile.outputMsg.getText());
 								} 
 								catch (Exception e1) 
 								{
 									e1.printStackTrace();
 								}
+								
 							}
 						
 					}
+					
 				});
+			
 	        tabbedPane.addTab("FILE", iconFile, panelFile, "Does nothing");
 	        
 	        imgURL = getClass().getResource("img/predizione.jpg");
@@ -273,8 +278,8 @@ public class RT extends JApplet {
 			if(answer.equals("OK"))
 			{
 				tab.panelDB.outputMsg.setText((String)readObject(socket));
-				System.out.println("FILE SALVATO CORRETTAMENTE!!!");
-				JOptionPane.showMessageDialog(this,"Caricamento da DB e salvataggio su file effettuati correttamente!!!");
+				System.out.println("Caricamento da DB effettuato correttamente...");
+				JOptionPane.showMessageDialog(this,"Caricamento da DB e salvataggio su file .dmp effettuati correttamente!!!");
 				tab.panelDB.saveButton.setEnabled(true);
 				return;
 			}
@@ -290,34 +295,8 @@ public class RT extends JApplet {
 			tab.panelDB.outputMsg.setText(e.toString());
 		}
 		
-		/*
-		try{
-			tab.panelDB.saveButton.setEnabled(false);
-			JButton b=(JButton).getSource();
-			if(b.getText()=="SALVA SU PDF") {			
-				String dest=panelDB.fc.getSelectedFile().getAbsolutePath()+".pdf";
-			File file = new File(dest);
-			file.getParentFile().mkdirs();
-			Document document = new Document();
-			try {
-				PdfWriter.getInstance(document, new FileOutputStream(dest));
-			} catch (DocumentException e1) {
-				e1.printStackTrace();
-			}
-			com.itextpdf.text.Rectangle two = new com.itextpdf.text.Rectangle(700,400);
-						        
-			document.open();
-			Paragraph p = new Paragraph("Tabella: "+panelDB.tableText.getText()";
-			p.add(new Paragraph(" "));
-			try {
-				document.add(p);
-			} catch (DocumentException e1) {
-				e1.printStackTrace();
-			}			        			               
-			document.close();			        
-			System.out.println("Pdf salvato correttamente....");
-			JOptionPane.showMessageDialog(panelDB, "Pdf salvato correttamente!!!");	
-		*/
+		
+		
 	}
 	
 	
@@ -333,7 +312,7 @@ public class RT extends JApplet {
 			if(answer.equals("OK"))
 			{
 				tab.panelFile.outputMsg.setText((String)readObject(socket));
-				System.out.println("FILE CARICATO CORRETTAMENTE");
+				System.out.println("Caricamneto da File riuscito correttamente...");
 				JOptionPane.showMessageDialog(this,"File caricato correttamente!!!");
 				tab.panelFile.saveButton.setEnabled(true);
 				return;
@@ -442,15 +421,19 @@ public class RT extends JApplet {
 	        float margin = 72;
 	        float startX = mediabox.getLowerLeftX() + margin/2;
 	        float startY = mediabox.getUpperRightY() - margin;
-			float center = mediabox.getWidth() /2.0f;
-
+			float center = mediabox.getWidth() /5.0f;
+	      	
 	        List<String> lines = new ArrayList<String>();
+	               	     
 	        int lastSpace = -1;
+	                	
 	        while (text.length() > 0)
 	        {
 	            int spaceIndex = text.indexOf('\n');
+	                              	
 	            if (spaceIndex < 0)
-	            {
+	            {   
+	            	       	
 	                lines.add(text);
 	                text = "";
 	            }
@@ -470,6 +453,7 @@ public class RT extends JApplet {
 	        contentStream.beginText();
 	        contentStream.setFont(pdfFont, fontSize);
 	        contentStream.moveTextPositionByAmount(startX, startY + margin - center);
+	        
 	        for (String line: lines)
 	        {
 	            contentStream.drawString(line);
@@ -495,8 +479,11 @@ public class RT extends JApplet {
 			contentStream.close();
 			doc.save(title);
 			doc.close();
+			System.out.println("File PDF salvato correttamente...");
 			JOptionPane.showMessageDialog(this,"File PDF salvato correttamente!!!");
-		}
+			
+			
+			}
 		catch (Exception e) {}
 	}
 }

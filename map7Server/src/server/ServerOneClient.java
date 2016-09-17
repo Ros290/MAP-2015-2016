@@ -104,7 +104,7 @@ class ServeOneClient extends Thread {
 					}
 					catch(IOException e){
 						out.writeObject("Caricamento non riuscito");
-					}
+					} 
 					
 					writeObject(socket,result);
 				break;	

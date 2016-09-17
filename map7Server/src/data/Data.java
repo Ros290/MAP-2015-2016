@@ -21,7 +21,7 @@ import exception.TrainingDataException;
 public class Data implements Serializable
 {
 	
-	//private Object data [][];
+	
 	private List<Example> data = new ArrayList<Example>();
 	
 	private int numberOfExamples;
@@ -34,7 +34,7 @@ public class Data implements Serializable
 		DbAccess db = new DbAccess();
 		TableData td = new TableData (db);
 		
-			//db.initConnection();
+			
 			DbAccess.initConnection();
 			TableSchema ts = new TableSchema (db, tableName);
 			this.data = td.getTransazioni(tableName);
@@ -54,77 +54,7 @@ public class Data implements Serializable
 		
 		
 		
-	/*
-		  File inFile = new File (fileName);
-
-		  Scanner sc = new Scanner (inFile);
-	      String line = sc.nextLine();
-	      if(!line.contains("@schema"))
-	      {
-	    	  sc.close();
-	    	  throw new RuntimeException("Errore nello schema");
-	      }
-	      //String s[]=line.split(" ");
-		  //popolare explanatory Set 
-	      //@schema 4
-	      
-		  //explanatorySet = new Attribute[new Integer(s[1])];
-	      short iAttribute=0;
-	      line = sc.nextLine();
-	      while(!line.contains("@data"))
-	      {
-	    	  List <String> s = new ArrayList <String> (Arrays.asList(line.split(" ")));
-	    	  if (s.get(0).equals("@desc"))
-	    	  { // aggiungo l'attributo allo spazio descrittivo
-		    		//@desc KmPercorsi => Continuous Attribute
-	    		    if (s.size() == 2)
-	    		    	explanatorySet.add (new ContinuousAttribute (s.get(1), iAttribute));
-	    		    else
-	    		    //@desc motor A,B,C,D,E => discrete Attribute
-	    		    {
-		    		  	Set<String> discreteValues = new HashSet <String> (Arrays.asList(s.get(2).split(",")));
-		    		  	explanatorySet.add(new DiscreteAttribute (s.get(1), iAttribute, discreteValues ));	    		    	
-	    		    }
-
-		      }
-	    	  else if(s.get(0).equals("@target"))
-	    			  classAttribute=new ContinuousAttribute(s.get(1), iAttribute);
-	    			  
-	    	  iAttribute++;
-	    	  line = sc.nextLine();
-	    	  
-	      }
-		      
-		  //avvalorare numero di esempi
-	      //@data 167
-	      numberOfExamples=new Integer(line.split(" ")[1]);
-	      
-	      //popolare data
-	      data=new Object[numberOfExamples][explanatorySet.size()+1];
-	      		     
-	      short iRow=0;
-	      while (sc.hasNextLine())
-	      {
-	    	  line = sc.nextLine();
-	    	  // assumo che attributi siano tutti discreti
-	    	  /*
-	    	  s=line.split(","); //E,E,5,4, 0.28125095
-	    	  for(short jColumn=0;jColumn<s.length-1;jColumn++)
-	    	  	  data[iRow][jColumn]=s[jColumn];
-	    	  data[iRow][s.length-1]=new Double(s[s.length-1]);
-	    	   */
-				/*
-	    	  List <String> s = new ArrayList <String> (Arrays.asList(line.split(",")));
-	    	  for(short jColumn=0;jColumn<s.size()-1;jColumn++)
-		      if (explanatorySet.get(jColumn) instanceof ContinuousAttribute)
-		    	  data[iRow][jColumn]=new Double (s.get(jColumn));
-	    	  else
-	    		  data[iRow][jColumn]=s.get(jColumn);
-	    	  data[iRow][s.size()-1]=new Double(s.get(s.size()-1));
-	    	  iRow++;
-	      }
-		  sc.close();
-	*/
+	
 	
 	
 	/**
@@ -171,7 +101,7 @@ public class Data implements Serializable
 	 */
 	public Double getClassValue (int exampleIndex)
 	{
-		//return (Double) data[exampleIndex][this.explanatorySet.size()];
+		
 		return (Double) data.get(exampleIndex).get(this.explanatorySet.size());
 	}
 	
@@ -183,7 +113,7 @@ public class Data implements Serializable
 	 */
 	public Object getExplanatoryValue(int exampleIndex, int attributeIndex)
 	{
-		//return data[exampleIndex][attributeIndex];
+		
 		return data.get(exampleIndex).get(attributeIndex);
 	}
 	
@@ -220,11 +150,7 @@ public class Data implements Serializable
 	{
 		Example temp;
 		for (int k=0;k<getNumberOfExplanatoryAttributes()+1;k++){
-			/*
-			temp=data[i][k];
-			data[i][k]=data[j][k];
-			data[j][k]=temp;
-			*/
+			
 			temp=data.get(i);
 			data.set(i, data.get(j));
 			data.set(j,temp);	
