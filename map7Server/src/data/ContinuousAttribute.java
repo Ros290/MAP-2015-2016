@@ -1,12 +1,13 @@
 package data;
 
 /*
- * Estensione della classe Attribute
+ * Estende la classe Attribute
+ * Rappresenta un attributo continuo
  */
 public class ContinuousAttribute extends Attribute
 {
     /**
-     * Inizializza
+     * Invoca il costruttore della super-classe
      *
      * @param name   nome dell'attributo
      * @param index  identificativo dell'attributo

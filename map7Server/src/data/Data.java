@@ -16,7 +16,9 @@ import exception.EmptySetException;
 import exception.TrainingDataException;
 
 
-
+/*
+ * Classe che modella l'insieme degli esempi di training 
+ */
 @SuppressWarnings("serial")
 public class Data implements Serializable
 {
@@ -28,6 +30,11 @@ public class Data implements Serializable
 	private List<Attribute> explanatorySet = new LinkedList<Attribute>();
 	private ContinuousAttribute classAttribute;
 	
+	/**
+     * Avvalora explanatorySet, avvalora classAttribue, avvaloa il numero di esempi e popola data con gli esempi di taining 
+     *
+     * @param tableName nome del file contenente i dati
+     */
 	public Data(String tableName)throws FileNotFoundException, TrainingDataException, ClassNotFoundException, DatabaseConnectionException, SQLException, EmptySetException
 	{
 		int i;
@@ -53,14 +60,10 @@ public class Data implements Serializable
 	}
 		
 		
-		
-	
-	
-	
 	/**
-	 *Ritorna , in formato stringa, tutto il contenuto di Data
+	 *Restituisce in formato stringa, tutto il contenuto di data
 	 *
-	 *@return Stringa con tutti gli elementi all'interno di Data
+	 *@return Stringa con tutti gli elementi all'interno di data
 	 */
 	public String toString()
 	{
@@ -77,7 +80,9 @@ public class Data implements Serializable
 	}
 	
 	/**
-	 * Ritorna il numero degli esempi rimportati all'interno di Data
+	 * Restituisce il valore del membro numberOfExamples
+	 * Restituisce il numero degli esempi riportati all'interno di data
+	 * 
 	 * @return cardinalità di esempi
 	 */
 	public int getNumberOfExamples ()
@@ -86,7 +91,8 @@ public class Data implements Serializable
 	}
 	
 	/**
-	 * Ritorna il numero di Attributi Indipendenti di cui è composta la collezione di esempi
+	 * Restituisce la cardinalità dell'insieme explanatorySet
+	 *
 	 * @return Numero di Attributi Indipendenti
 	 */
 	public int getNumberOfExplanatoryAttributes()
@@ -95,30 +101,31 @@ public class Data implements Serializable
 	}
 	
 	/**
-	 * Ritorna il valore associato all'attributo di classe riferito all'esempio in posizione exampleIndex
+	 * Restituisce il valore associato all'attributo di classe per l'esempio indicizzato da exampleIndex
+	 * 
 	 * @param exampleIndex indice dell'esempio che si desidera analizzare
-	 * @return Il valore all'interno dell'attributo di classe
+	 * @return il valore all'interno dell'attributo di classe
 	 */
 	public Double getClassValue (int exampleIndex)
 	{
-		
 		return (Double) data.get(exampleIndex).get(this.explanatorySet.size());
 	}
 	
 	/**
-	 * Ritorna il valore associato all'attributo con indice attributeIndex, riferito all'esempio con indice exampleIndex 
+	 * Restituisce il valore associato all'attributo con indice attributeIndex, riferito all'esempio con indice exampleIndex 
+	 * 
 	 * @param exampleIndex  indice dell'esempio che si desidera analizzare
 	 * @param attributeIndex indice di un determinato attributo (indipendente o di classe)
-	 * @return
+	 * @return il valore dell'attributo indicizzato da attributeIndex per l'esempio exampleIndex
 	 */
 	public Object getExplanatoryValue(int exampleIndex, int attributeIndex)
 	{
-		
 		return data.get(exampleIndex).get(attributeIndex);
 	}
 	
 	/**
-	 * Ritorna l'attributo di indice index
+	 * Restituisce l'attributo indicizzato da index in explanatorySet
+	 * 
 	 * @param index indice di un determinato attributo
 	 * @return l'attributo che si vuole analizzare
 	 */
@@ -127,6 +134,11 @@ public class Data implements Serializable
 		return this.explanatorySet.get(index);
 	}
 
+	/**
+	 * Restituisce l'oggetto corripondente all'attributo di classe
+	 * 
+	 * @return oggetto ContinuousAttribute associato al membro classAttribute
+	 */
 	public ContinuousAttribute getClassAttribute()
 	{
 		return this.classAttribute;
@@ -135,6 +147,7 @@ public class Data implements Serializable
 	/**
 	 * Permette l'ordinamento degli esempi da beginExampleIndex a endExampleIndex, in base al valore che contengono
 	 * in un determinato attributo
+	 * 
 	 * @param attribute attributo indipendente, in modo tale che gli esempi vengano ordinati in base al valore assunto per quel 
 	 * determinato attributo
 	 * @param beginExampleIndex indice di partenza della sotto-collezione di data che si vuole ordinare
@@ -145,7 +158,14 @@ public class Data implements Serializable
 		quicksort(attribute, beginExampleIndex, endExampleIndex);
 	}
 	
-	// scambio esempio i con esempi oj
+	
+	/**
+	 * Funzione accessoria per lo scambio
+	 * Scambia l'esempio i con l'esempio j
+	 * 
+	 * @param i indice 
+	 * @param j indice 
+	 */
 	private void swap(int i,int j)
 	{
 		Example temp;
@@ -157,11 +177,13 @@ public class Data implements Serializable
 		}
 	}
 	
-
 	
-	
-	/*
+	/**
 	 * Partiziona il vettore rispetto all'elemento x e restiutisce il punto di separazione
+	 * 
+	 * @param attribute attributo 
+	 * @param inf indice
+	 * @param sup indice
 	 */
 	private  int partition(Attribute attribute, int inf, int sup)
 	{
@@ -196,10 +218,12 @@ public class Data implements Serializable
 		return j;
 	}
 	
-	/*
-	 * Algoritmo quicksort per l'ordinamento di un array di interi A
-	 * usando come relazione d'ordine totale "<="
-	 * @param A
+	/**
+	 * Algoritmo quicksort per l'ordinamento di un array di interi 
+	 * 
+	 * @param attribute attributo 
+	 * @param inf indice
+	 * @param sup indice
 	 */
 	private void quicksort(Attribute attribute, int inf, int sup)
 	{

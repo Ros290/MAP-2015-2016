@@ -5,14 +5,17 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-
+/*
+ * Estende la classe Attribute e rappresenta un attributo discreto
+ */
 @SuppressWarnings("serial")
 public class DiscreteAttribute extends Attribute implements Iterable<Object>, Serializable
 {
 	private Set<Object> values=new TreeSet<Object>();
 
     /**
-     * Inizializza
+     * Invoca il costruttore della super-classe
+     * Inizializza i valori di un attributo discreto
      *
      * @param name   nome dell'attributo
      * @param index  identificativo dell'attributo
@@ -27,6 +30,7 @@ public class DiscreteAttribute extends Attribute implements Iterable<Object>, Se
 	
 	
 	/**
+	 * Restituisce la carinalòità di values
 	 * Ottiene il numero di valori discreti nell'attributo
 	 * 
 	 * @return numero di valori discreti nell'attributo 
