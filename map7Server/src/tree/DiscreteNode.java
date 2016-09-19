@@ -4,11 +4,12 @@ import data.Attribute;
 import data.Data;
 import data.DiscreteAttribute;
 
-
+//classe che modella l'entità nodo di split relativo ad un attributo indipendente discreto
 public class DiscreteNode extends SplitNode
 {
 	/**
 	 * Costruttore di uno SplitNode con attributo indipendente di tipo discreto 
+	 * 
 	 * @param trainingSet collezione di training che si vuole analizzare
 	 * @param beginExampleIndex indica l'esempio di partenza del sotto-insieme di training da analizzare tramite indice intero
 	 * @param endExampleIndex indica l'ultimo esempio del sotto-insieme di training da analizzare tramite indice intero 
@@ -20,7 +21,9 @@ public class DiscreteNode extends SplitNode
 	}
 	
 	/**
-	 * Popola lo SplitNode, in base al sotto-insieme di training in analisi, categorizzando gli esempi in base all'attributo indipendente passato come parametro
+	 * Popola lo SplitNode, in base al sotto-insieme di training in analisi, 
+	 * categorizzando gli esempi in base all'attributo indipendente passato come parametro
+	 * 
 	 * @param trainingSet collezione di training che si vuole analizzare
 	 * @param beginExampleIndex indica l'esempio di partenza del sotto-insieme di training da analizzare tramite indice intero
 	 * @param endExampleIndex indica l'ultimo esempio del sotto-insieme di training da analizzare tramite indice intero 
@@ -29,19 +32,6 @@ public class DiscreteNode extends SplitNode
 	@Override
 	void setSplitInfo(Data trainingSet,int beginExampleIndex, int endExampleIndex, Attribute attribute)
 	{
-		/*
-		 * Definisco una collezione di splitNode di nome mapSplit2, tale collezione avrà tanti figli quanti sono i valori quali
-		 * l'attributo indipendente POTREBBE contenere (poichè non è detto che, nella collezione di esempi, siano riportati
-		 * tutti i valori.
-		 * 
-		 * Esempio: se attributo indipendete di nome "Figura" può assumere valori come "quadrato, cerchio, rettangolo",
-		 * ma negli esempi analizzati si possono trovare solo esempi che si riferiscono unicamente a "quadrato"
-		 * 
-		 * Infatti per ovviare a ciò, scandendo uno per uno gli esempi del sotto-insieme, si contano quanti sono i valori della classe indipendente
-		 * effettivamente assunti dagli esempi, così che si possa ritornare una collezione costituita UNICAMENTE da valori effettivamente
-		 * presnti nella collezione di Training 
-		 */
-		
 		Object currentSplitValue = trainingSet.getExplanatoryValue(beginExampleIndex, attribute.getIndex());
 		int start = beginExampleIndex;
 		int child = 0;
@@ -59,10 +49,10 @@ public class DiscreteNode extends SplitNode
 	}
 	
 	
-	
 	/**
 	 * Effettua il confronto di value con i valori di tutti i nodi figli dello splitNode in analisi, restituisce 
 	 * l'identificativo del nodo figlio qualora la condizione si verifichi, altrimenti torna -1
+	 * 
 	 * @param value valore con cui confrontare i valori dei nodi figli di uno splitNode
 	 * @return identificativo di un nodo figlio, se il valore di tale nodo corrisponde a value, altrimenti -1 
 	 */
@@ -77,6 +67,11 @@ public class DiscreteNode extends SplitNode
 		return -1;
 	}
 	
+	/**
+	 *Restituisce in formato stringa tutto il contenuto di DiscreteNode
+	 *
+	 *@return Stringa con tutti gli elementi all'interno di DiscreteNode
+	 */
 	public String toString ()
 	{	
 		return "DISCRETE " + super.toString();
@@ -84,6 +79,7 @@ public class DiscreteNode extends SplitNode
 	
 	/**
 	 * Effettua il confronto con un altro SplitNode, in base al risultato si può capire quale sia lo splitNode con meno Varianza
+	 * 
 	 * @param o SplitNode da confrontare con quello corrente
 	 * @return 0 se gli SplitNode hanno stessa varianza, 1 se o ha la varianza minore, -1 altrimenti
 	 */

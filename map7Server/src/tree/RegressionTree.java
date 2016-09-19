@@ -19,20 +19,30 @@ import exception.UnknownValueException;
 /*
  * Struttura ad albero, ogni root può contenere o uno SplitNode (sotto-albero di profondità 1) o un nodo foglia.
  * Qualora root avesse dei nodi figli, essi saranno definiti ricorsivamente come RegressionTree nel campo childTree
+ * Classe che modella l'entità albero di decisione come insieme di sotto-alberi
  */
 @SuppressWarnings("serial")
 public class RegressionTree implements Serializable 
 {
+	//radice del sotto-albero corrente
 	Node root;
+	
+	//array di sotto-alberi originati nel nodo root
+	//vi è un array per ogni livello di profondità nell'intero albero
 	RegressionTree childTree[];
 	
+	/**
+	 *Istanzia un sotto-albero dell'intero albero
+	 */
 	RegressionTree ()
 	{
 		this.childTree = new RegressionTree [1];
 	}
 	
 	/**
-	 * definisce regressionTree come albero contenente i dati all'interno di Data
+	 * Istanzia un sotto-albero dell'intero albero ed avvia l'induzione dell'albero dagli esempi di training in input
+	 * Definisce regressionTree come albero contenente i dati all'interno di Data
+	 * 
 	 * @param trainingSet collezione di esempi che si vuole riportare tramite RegressionTree
 	 */
 	public RegressionTree (Data trainingSet)
@@ -50,7 +60,8 @@ public class RegressionTree implements Serializable
 	 * @throws FileNotFoundException se il file non esiste
 	 * @throws IOException           se le operazioni di I/O sono fallite o interrotte
 	 */
-	public void salva(String nomeFile) throws FileNotFoundException, IOException {
+	public void salva(String nomeFile) throws FileNotFoundException, IOException 
+	{
 		FileOutputStream outFile = new FileOutputStream(nomeFile);
 		ObjectOutputStream outStream = new ObjectOutputStream(outFile);
 		outStream.writeObject(this);
@@ -58,8 +69,7 @@ public class RegressionTree implements Serializable
 	}
 	
 	/**
-	 * Legge e restituisce l’oggetto come è memorizzato nel file il cui nome è passato come 
-	 * parametro.
+	 * Legge e restituisce l’oggetto come è memorizzato nel file il cui nome è passato come parametro.
 	 * 
 	 * @param nomeFile                nome del file
 	 * @return                        oggetto memorizzato nel file
@@ -67,7 +77,8 @@ public class RegressionTree implements Serializable
 	 * @throws IOException            se le operazioni di I/O sono fallite o interrotte
 	 * @throws ClassNotFoundException se si verifica un type mismatch
 	 */
-	public static RegressionTree carica(String nomeFile) throws FileNotFoundException, IOException, ClassNotFoundException{
+	public static RegressionTree carica(String nomeFile) throws FileNotFoundException, IOException, ClassNotFoundException
+	{
 		FileInputStream inFile = new FileInputStream(nomeFile);
 		ObjectInputStream inStream = new ObjectInputStream(inFile);
 		RegressionTree regT = (RegressionTree) inStream.readObject();
@@ -76,14 +87,23 @@ public class RegressionTree implements Serializable
 	}
 
 
-	
+	/**
+	 * Verifica se il sotto-insieme corrente può essere coperto da un nodo foglia 
+	 * controllando la cardinalità di tale sotto-insieme
+	 * 
+	 * @param trainingSet             trainingSet da anlizzare
+	 * @param begin					  indica l'esempio di partenza del sotto-insieme di training da analizzare 
+	 * @param end					  indica l'ultimo esempio del sotto-insieme di training da analizzare
+	 * @param numberOfExamplesPerLeaf indica il numero minimo che una foglia deve contenere 
+	 * @return esito sulle condiioni per i nodi fogliari
+	 */
 	boolean isLeaf(Data trainingSet,int begin, int end,int numberOfExamplesPerLeaf)
 	{
 		return ((end - begin)<= numberOfExamplesPerLeaf);
 	}
 	
 	/**
-	 * determina il "miglior" splitNode definibile con gli esempi compresi tra gli indici begin ed end nella collezione
+	 * Determina il "miglior" splitNode definibile con gli esempi compresi tra gli indici begin ed end nella collezione
 	 * 
 	 * @param trainingSet collezione degli esempi
 	 * @param begin indice della sotto-collezione da cui si vuole definire lo splitNode desiderato
@@ -135,10 +155,7 @@ public class RegressionTree implements Serializable
 		/**
 		 * Costruttore di alberi di regressione in maniera ricorsiva (definisce 
 		 * il sotto-albero di prondità 1 e definisce gli eventuali sotto-alberi dei suoi figli, e 
-		 * così via dicendo dei figli dei figli e blablabla). Occhio ad usarlo, può influire in 
-		 * maniera non banale sul trainingSet. per la costruzione dell'albero di regressione verrano 
-		 * considerati tutti gli esempi che saranno compresi dall'indice begin all'indice end del 
-		 * trainingSet.
+		 * così via dicendo dei figli dei figli...). 
 		 * 
 		 * @param trainingSet collezione di esempi che si vuole riportare all'interno di un albero di regressione
 		 * @param begin indice della sotto-collezione da cui si vuole definire lo splitNode desiderato
@@ -168,7 +185,12 @@ public class RegressionTree implements Serializable
 					root=new LeafNode(trainingSet,begin,end);
 			}
 		}
-			
+		
+		/**
+		 *Restituisce in formato stringa tutto il contenuto di RegressionTree
+		 *
+		 *@return Stringa con tutti gli elementi all'interno di RegressionTree
+		 */
 		public String toString()
 		{
 			String tree=root.toString()+"\n";
@@ -186,7 +208,9 @@ public class RegressionTree implements Serializable
 		}
 		
 		/**
-		 * Stampa le regole dell'albero di regressione
+		 *Restituisce in formato stringa tutte le regole dell'albero di rgressione 
+		 *
+		 *@return Stringa con tutte le regole dell'albero di regressione
 		 */
 		public String printRules()
 		{
@@ -197,6 +221,12 @@ public class RegressionTree implements Serializable
 			return x;
 		}
 		
+		/**
+		 *Restituisce in formato stringa tutte le regole dell'albero di rgressione 
+		 *
+		 *@param rule informazioni del nodo di split del sotto-albero al livello superiore
+		 *@return Stringa con tutte le regole dell'albero di regressione
+		 */
 		private String printRules2(String rule)
 		{
 			String rule2 = "";
@@ -220,6 +250,8 @@ public class RegressionTree implements Serializable
 		
 		/**
 		 *Stampa l'albero di regressione 
+		 *
+		 *@return l'albero di regressione
 		 */
 		public String printTree()
 		{
@@ -231,8 +263,12 @@ public class RegressionTree implements Serializable
 		}
 		
 		/**
-		 * consente all'utente di percorrere in profondità l'albero di decisione, seguendo il percorso
+		 * Consente all'utente di percorrere in profondità l'albero di decisione, seguendo il percorso
 		 * a proprio piacimento
+		 * Visualizza le informazioni di ciasuno split dell'albero
+		 * e per il corrispondente attributo acquisisce il valore dell'esempio da predire da tastiera
+		 * Se il nodo root corrente è leaf allora termina l'acquisizione e visualizza la predizione per l'attributo di classe, 
+		 * altrimenti invoca riscorsivamente sul figlio di root in childTree, in base al valore acquisito da tastiera
 		 * @return ritorna il risultato della predizione
 		 * @throws UnknownValueException
 		 */

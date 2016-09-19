@@ -16,24 +16,32 @@ import exception.EmptySetException;
 import exception.TrainingDataException;
 
 
-/*
- * Classe che modella l'insieme degli esempi di training 
- */
+//Classe che modella l'insieme degli esempi di training 
 @SuppressWarnings("serial")
 public class Data implements Serializable
 {
-	
-	
+	//contenitore di oggeti di tipo Example che contiene il trainingSet
 	private List<Example> data = new ArrayList<Example>();
 	
+	//cardinalità del trainingSet
 	private int numberOfExamples;
+	
+	//contenitore di oggetti di tipo Attribute per rappresentare gli attributi indipendenti
 	private List<Attribute> explanatorySet = new LinkedList<Attribute>();
+	
+	//oggetto per modellare l'attributo di classe
 	private ContinuousAttribute classAttribute;
 	
 	/**
-     * Avvalora explanatorySet, avvalora classAttribue, avvaloa il numero di esempi e popola data con gli esempi di taining 
+     * Avvalora explanatorySet, avvalora classAttribue, avvalora il numero di esempi e popola data con gli esempi di taining 
      *
      * @param tableName nome del file contenente i dati
+     * @throw FileNotFoundException se il file non esiste
+     * @throw TrainingDataException
+     * @throw ClassNotFoundException
+     * @throw DatabaseConnectionException se la connessione con il database fallisce 
+     * @throw SQLException
+     * @throw EmptySetException
      */
 	public Data(String tableName)throws FileNotFoundException, TrainingDataException, ClassNotFoundException, DatabaseConnectionException, SQLException, EmptySetException
 	{
@@ -61,7 +69,7 @@ public class Data implements Serializable
 		
 		
 	/**
-	 *Restituisce in formato stringa, tutto il contenuto di data
+	 *Restituisce in formato stringa tutto il contenuto di data
 	 *
 	 *@return Stringa con tutti gli elementi all'interno di data
 	 */
@@ -71,9 +79,7 @@ public class Data implements Serializable
 		for(int i=0;i<numberOfExamples;i++)
 		{
 			for(int j=0;j<explanatorySet.size();j++)
-				//value+=data[i][j]+",";
 				value+=data.get(i).get(j)+",";
-			//value+=data[i][explanatorySet.size()]+"\n";
 			value+=data.get(i).get(explanatorySet.size())+"\n";
 		}
 		return value;

@@ -3,22 +3,28 @@ import java.io.Serializable;
 
 import data.Data;
 
-
+//Classe che modella l'astrazione dell'entità nodo dell'albero di decisione
 @SuppressWarnings("serial")
 abstract class Node implements Serializable
 {
+	//contatore dei nodi generati nell'albero
 	private static int idNodeCount = 0;
+	
+	//identificativo numerico del nodo
 	private int idNode;
+	
+	//indice che individua l'inizio del sotto-insieme di training
 	private int beginExampleIndex;
+	
+	//indice che individua la fine del sotto-insieme di training
 	private int endExampleIndex;
+	
+	//valore della varianza calcolata, rispetto all'attributo di classe, nel sotto-insieme di training del nodo
 	private double variance;
 	
 	/**
-	 * Costruttore della classe Node, quale definisce il sotto-insieme di training quale il nodo conterrà.
-	 * In aggiunta avrà un ID univoco e conterrà la Varianza calcolato dagli attributi di classe presenti nel sotto-insieme di training.
-	 * 
-	 * Esempio: supponendo che il traingSet abbia 100 esempi, e vogliamo definire un nodo che copra gli elementi dalla posizione 55 al 66,
-	 * allora i successivi parametri saranno, appunto, 55 e 66
+	 * Costruttore della classe Node
+	 * Conterrà la varianza calcolato rispetto agli attributi di classe presenti nel sotto-insieme di training.
 	 * 
 	 * @param trainingSet viene passato l'intero insieme di training, da cui si ricaverà il sotto-insieme in base agli indici passati in parametro
 	 * @param beginExampleIndex Indice che individua il "punto di partenza" del sotto-insieme di training
@@ -42,7 +48,9 @@ abstract class Node implements Serializable
 	}
 	
 	/**
+	 * Restituisce il valore del membro idNode
 	 * Restituisce l'ID univoco del dato Nodo
+	 * 
 	 * @return ID del nodo
 	 */
 	int getIdNode ()
@@ -52,6 +60,7 @@ abstract class Node implements Serializable
 	
 	/**
 	 * Restituisce la posizione da cui inizia il sotto-insieme di training contenuto nel Nodo
+	 * 
 	 * @return Indice per un dato esempio del trainingSet, quale sarebbe il primo esempio del sotto-insieme
 	 */
 	int getBeginExampleIndex ()
@@ -61,6 +70,7 @@ abstract class Node implements Serializable
 
 	/**
 	 * Restituisce la posizione in cui finisce il sotto-insieme di training contenuto nel Nodo
+	 * 
 	 * @return Indice per un dato esempio del trainingSet, quale sarebbe l'ultimo esempio del sotto-insieme
 	 */
 	int getEndExampleIndex ()
@@ -70,6 +80,7 @@ abstract class Node implements Serializable
 	
 	/**
 	 * Restituisce la varianza che è stata ricavata in base agli attributi di classe appartenenti al sotto-insieme di training
+	 * 
 	 * @return Varianza degli esempi coperti dal Nodo
 	 */
 	double getVariance ()
@@ -79,10 +90,16 @@ abstract class Node implements Serializable
 	
 	/**
 	 * Indica il numero di nodi sottostanti a quello corrente
+	 * 
 	 * @return numero di nodi figli a quello corrente
 	 */
 	abstract int getNumberOfChildren ();
 	
+	/**
+	 *Restituisce in formato stringa, tutto il contenuto di Node
+	 *
+	 *@return Stringa con tutti gli elementi all'interno di Node
+	 */
 	public String toString ()
 	{
 		return " Nodo: [Examples:" + this.beginExampleIndex + "-" + (this.endExampleIndex) + "] variance:" + this.variance;

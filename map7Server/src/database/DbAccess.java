@@ -6,23 +6,29 @@ import java.sql.SQLException;
 
 import exception.DatabaseConnectionException;
 
+//classe che realizza l'accesso alla base di dati
 public class DbAccess {
 	
 	private static String DRIVER_CLASS_NAME = "org.gjt.mm.mysql.Driver";
 	private final static String DBMS = "jdbc:mysql";
-	private final static String SERVER = "localhost";
-	private final static String DATABASE = "MapDb";
-	private final static String PORT = "3306";
-	private final static String USER_ID = "MapUser";
-	private final static String PASSWORD = "map";
-	private static Connection conn;
 	
-	/*
-	public DbAccess(List<String> selectedValues){
-		DbAccess.PORT = selectedValues.get(0);
-		DbAccess.USER_ID = selectedValues.get(1);
-		DbAccess.PASSWORD = selectedValues.get(2);
-	}*/
+	//identificativo del server su cui risiede la base di dati
+	private final static String SERVER = "localhost";
+	
+	//nome della base di dati
+	private final static String DATABASE = "MapDb";
+	
+	//porta su cui il DBMS MySQL accetta le connessioni
+	private final static String PORT = "3306";
+	
+	//nome utente per l'accesso alla base di dati
+	private final static String USER_ID = "MapUser";
+	
+	//password di autenticazione per l'utente dentificato da USER_ID 
+	private final static String PASSWORD = "map";
+	
+	//gestisce una connessione
+	private static Connection conn;
 	
 	public static void initConnection() throws DatabaseConnectionException, ClassNotFoundException {
 		String url = DBMS+"://" + SERVER + ":" + PORT + "/" + DATABASE;
