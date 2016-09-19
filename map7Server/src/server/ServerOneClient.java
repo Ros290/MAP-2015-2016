@@ -69,19 +69,11 @@ class ServeOneClient extends Thread {
 						tree = new RegressionTree(TrainingSet);
 						writeObject(socket,"OK");
 						result = new String (tree.printRules() + tree.printTree());
-					} 
-					catch (SQLException e){
-						System.out.println("La tabella non esiste");
-					} 
-					catch (EmptySetException e){	
-						System.out.println("ResultSet vuoto!!!");
-					}	 
-					catch (DatabaseConnectionException e){
-						System.out.println("Errore di connessione al database");
-					} 
-					catch (TrainingDataException e) {
-						System.out.println("Impossibile trovare il file specificato");
-					} 
+					}
+						
+						catch(IOException | ClassNotFoundException | TrainingDataException | DatabaseConnectionException | SQLException | EmptySetException e){
+							
+						} 
 															
 					if( tree != null) {
 						tree.salva(nome);
@@ -102,8 +94,8 @@ class ServeOneClient extends Thread {
 						writeObject(socket,"OK"); 
 						result = new String(tree.printRules() + tree.printTree());
 					}
-					catch(IOException e){
-						out.writeObject("Caricamento non riuscito");
+					catch(IOException | ClassNotFoundException e){
+						
 					} 
 					
 					writeObject(socket,result);
@@ -115,11 +107,9 @@ class ServeOneClient extends Thread {
 					break;
 					
 				}
-			} catch (ClassNotFoundException e) {
-				flag=false;
-				} 
+			} catch (ClassNotFoundException e) {flag=false;} 
 			  catch (IOException e) { flag=false;}
-			catch (UnknownValueException e) {flag = false;}	
+			catch (UnknownValueException e) {flag = false;}
 		}
 		try{
 			socket.close();
