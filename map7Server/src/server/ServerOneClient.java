@@ -69,19 +69,18 @@ class ServeOneClient extends Thread {
 						tree = new RegressionTree(TrainingSet);
 						writeObject(socket,"OK");
 						result = new String (tree.printRules() + tree.printTree());
-					}
-						
-						catch(IOException | ClassNotFoundException | TrainingDataException | DatabaseConnectionException | SQLException | EmptySetException e){
-							
-						} 
-															
+																				
 					if( tree != null) {
 						tree.salva(nome);
-						System.out.println("Salvataggio su file riuscito correttamente!!!");
+						System.out.println("Salvataggio su file .dmp riuscito correttamente!!!");
 					}	
 					else
-						System.out.println("Salvataggio su file non riuscito!!!");
-			
+						System.out.println("Salvataggio su file .dmp non riuscito!!!");
+					}
+					
+					catch(IOException | ClassNotFoundException | TrainingDataException | DatabaseConnectionException | SQLException | EmptySetException e){
+						
+					} 
 					writeObject(socket,result);
 			       break;
 				
@@ -90,7 +89,7 @@ class ServeOneClient extends Thread {
 					try{
 						nome = (String)readObject(socket);
 						tree = RegressionTree.carica(nome);
-						System.out.println("Caricamento da file riuscito correttamente!!!");
+						System.out.println("Caricamento da file .dmp riuscito correttamente!!!");
 						writeObject(socket,"OK"); 
 						result = new String(tree.printRules() + tree.printTree());
 					}
