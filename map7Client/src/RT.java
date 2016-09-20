@@ -33,6 +33,11 @@ import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
+import javax.swing.JFrame;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 public class RT extends JApplet {
 
 	private static final long serialVersionUID = 1L;
@@ -88,11 +93,13 @@ public class RT extends JApplet {
 		
 		
 		private class JPanelPredicting extends JPanel{
-			private JTextArea queryMsg=new JTextArea(4,50);
+			//private JTextArea queryMsg=new JTextArea(4,50);
+			private JPanel queryMsg = new JPanel ();
 			private JTextField answer=new JTextField(20);
 			private JButton startButton=new JButton("START");
 			private JButton executeButton=new JButton("CONTINUE");
 			private JLabel predictedClass = new JLabel("");
+			private JTree tree = new JTree ();
 			
 			JPanelPredicting( java.awt.event.ActionListener aStart, java.awt.event.ActionListener aContinue){
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
@@ -330,7 +337,7 @@ public class RT extends JApplet {
 			System.out.println("Starting prediction phase!");
 			String answer=readObject(socket).toString();
 			
-			
+			/*
 			if(answer.equals("QUERY")){
 				// Formualting query, reading answer
 				answer=readObject(socket).toString();
@@ -352,17 +359,51 @@ public class RT extends JApplet {
 				tab.panelPredict.startButton.setEnabled(true);
 				tab.panelPredict.executeButton.setEnabled(false);
 			}
+			*/
+			
+			if(answer.equals("QUERY"))
+			{
+				answer=readObject(socket).toString();
+				DefaultMutableTreeNode root = new DefaultMutableTreeNode ("ROOT");
+				int startString;
+				int spaceString;
+				String subString = "";
+				
+				List <String> listNodes = new ArrayList<String> ();
+				while (answer.length() > 0)
+				{
+					startString = answer.indexOf(':');
+					spaceString = answer.indexOf('\n');
+					subString = answer.substring(startString+1, spaceString);
+					listNodes.add(subString);
+					answer = answer.substring(spaceString+1);
+				}
+				
+				int n = listNodes.size();
+				DefaultMutableTreeNode childs [] = new DefaultMutableTreeNode [n];
+				
+				for (int i = 0; i < n ; i++)
+				{
+					childs [i] = new DefaultMutableTreeNode (listNodes.get(i));
+					root.add(childs[i]);
+				}
+				
+				tab.panelPredict.tree = new JTree(root);
+				tab.panelPredict.queryMsg.add(tab.panelPredict.tree);
+			}
 		}
 		catch(IOException | ClassNotFoundException e){
-			tab.panelPredict.queryMsg.setText(e.toString());
+			//tab.panelPredict.queryMsg.setText(e.toString());
+			JOptionPane.showMessageDialog(this,e.toString());
 			tab.panelPredict.startButton.setEnabled(true);
 			tab.panelPredict.executeButton.setEnabled(false);
 		}
 	}
 	
-	
+	/*
 	void continuePredictingAction(){
-		//TO BE DEFINED		
+		//TO BE DEFINED	
+		
 		try{		
 			writeObject(socket,new Integer(tab.panelPredict.answer.getText()));
 			System.out.println("Continuing prediction phase!");
@@ -392,8 +433,78 @@ public class RT extends JApplet {
 		catch(IOException | ClassNotFoundException e){
 			tab.panelPredict.queryMsg.setText(e.toString());
 		}
+		*/
+	
+	/*
+	 *  ****LAVORI IN CORSO****
+	 */
+	void continuePredictingAction()
+	{
+		//TO BE DEFINED	
+		
+		try
+		{
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) tab.panelPredict.tree.getLastSelectedPathComponent();
+			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+			int choice = parent.getIndex(node);
+			
+			writeObject(socket,new Integer(choice));
+			System.out.println("Continuing prediction phase!");
+			String answer=readObject(socket).toString();
+			
+			if(answer.equals("QUERY"))
+			{
+				answer=readObject(socket).toString();
+				int startString;
+				int spaceString;
+				String subString = "";
+				
+				List <String> listNodes = new ArrayList<String> ();
+				while (answer.length() > 0)
+				{
+					startString = answer.indexOf(':');
+					spaceString = answer.indexOf('\n');
+					subString = answer.substring(startString+1, spaceString);
+					listNodes.add(subString);
+					answer = answer.substring(spaceString+1);
+				}
+				
+				int n = listNodes.size();
+				DefaultMutableTreeNode childs [] = new DefaultMutableTreeNode [n];
+				
+				for (int i = 0; i < n ; i++)
+				{
+					childs [i] = new DefaultMutableTreeNode (listNodes.get(i));
+					node.add(childs[i]);
+				}
+				
+
+			}
+			/*
+			else
+			if(answer.equals("OK")){ 
+				answer=readObject(socket).toString();
+				tab.panelPredict.predictedClass.setText("Predicted class:"+answer);
+				tab.panelPredict.queryMsg.setText("");
+				tab.panelPredict.startButton.setEnabled(true);
+				tab.panelPredict.executeButton.setEnabled(false);
+			}
+			*/
+			else {
+				//Printing error message
+				JOptionPane.showMessageDialog(this,answer);
+				tab.panelPredict.startButton.setEnabled(false);
+				tab.panelPredict.executeButton.setEnabled(true);
+			}
+			
+		}
+		catch(IOException | ClassNotFoundException e){
+			JOptionPane.showMessageDialog(this,e.toString());
+		}
+		
 		
 	}
+	
 	
 	void PDFcreator (String title, String text)
 	{
