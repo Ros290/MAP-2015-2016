@@ -1,5 +1,6 @@
 
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -37,6 +38,7 @@ import javax.swing.JFrame;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 public class RT extends JApplet {
 
@@ -95,15 +97,18 @@ public class RT extends JApplet {
 		private class JPanelPredicting extends JPanel{
 			//private JTextArea queryMsg=new JTextArea(4,50);
 			private JPanel queryMsg = new JPanel ();
-			private JTextField answer=new JTextField(20);
+			//private JTextField answer=new JTextField(20);
 			private JButton startButton=new JButton("START");
 			private JButton executeButton=new JButton("CONTINUE");
 			private JLabel predictedClass = new JLabel("");
-			private JTree tree = new JTree ();
+			private JTree tree = new JTree();
+			private boolean flag = false;
+			
 			
 			JPanelPredicting( java.awt.event.ActionListener aStart, java.awt.event.ActionListener aContinue){
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 				JPanel  upPanel=new JPanel();
+				queryMsg.setPreferredSize(new Dimension (512,256));
 				upPanel.setLayout(new FlowLayout());
 				upPanel.add(queryMsg);
 				JScrollPane scrollingArea = new JScrollPane(queryMsg);
@@ -112,8 +117,8 @@ public class RT extends JApplet {
 				
 				JPanel  middlePanel=new JPanel();
 				middlePanel.setLayout(new FlowLayout());
-				middlePanel.add(new JLabel("Choise:"));
-				middlePanel.add(answer);
+				//middlePanel.add(new JLabel("Choise:"));
+				//middlePanel.add(answer);
 				startButton.addActionListener(aStart);
 				executeButton.addActionListener(aContinue);
 				middlePanel.add(startButton);
@@ -363,6 +368,7 @@ public class RT extends JApplet {
 			
 			if(answer.equals("QUERY"))
 			{
+					
 				answer=readObject(socket).toString();
 				DefaultMutableTreeNode root = new DefaultMutableTreeNode ("ROOT");
 				int startString;
@@ -389,7 +395,15 @@ public class RT extends JApplet {
 				}
 				
 				tab.panelPredict.tree = new JTree(root);
-				tab.panelPredict.queryMsg.add(tab.panelPredict.tree);
+				if (!tab.panelPredict.flag)
+					tab.panelPredict.queryMsg.add(tab.panelPredict.tree);
+				else
+				{
+					DefaultTreeModel model = (DefaultTreeModel)tab.panelPredict.tree.getModel();
+					DefaultMutableTreeNode newRoot = (DefaultMutableTreeNode) root;
+					model.reload(newRoot);
+				}
+
 			}
 		}
 		catch(IOException | ClassNotFoundException e){
@@ -440,13 +454,23 @@ public class RT extends JApplet {
 	 */
 	void continuePredictingAction()
 	{
-		//TO BE DEFINED	
-		
 		try
 		{
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) tab.panelPredict.tree.getLastSelectedPathComponent();
 			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
 			int choice = parent.getIndex(node);
+			int nChildren = parent.getChildCount() -1;
+			
+			while (nChildren >= 0 )
+			{
+				if (nChildren != choice)
+					parent.remove(nChildren);
+				nChildren --;
+			}
+			
+			DefaultTreeModel model = (DefaultTreeModel)tab.panelPredict.tree.getModel();
+			DefaultMutableTreeNode root = (DefaultMutableTreeNode) parent;
+			model.reload(root);
 			
 			writeObject(socket,new Integer(choice));
 			System.out.println("Continuing prediction phase!");
@@ -471,25 +495,31 @@ public class RT extends JApplet {
 				
 				int n = listNodes.size();
 				DefaultMutableTreeNode childs [] = new DefaultMutableTreeNode [n];
+				//root = (DefaultMutableTreeNode) node;
 				
 				for (int i = 0; i < n ; i++)
 				{
 					childs [i] = new DefaultMutableTreeNode (listNodes.get(i));
 					node.add(childs[i]);
+					//root.add(childs[i]);
+					
 				}
 				
+				//root.add(new DefaultMutableTreeNode("another_child"));
+				model.reload(root);
 
 			}
-			/*
-			else
-			if(answer.equals("OK")){ 
+
+			else if(answer.equals("OK"))
+			{ 
 				answer=readObject(socket).toString();
 				tab.panelPredict.predictedClass.setText("Predicted class:"+answer);
-				tab.panelPredict.queryMsg.setText("");
+				//tab.panelPredict.queryMsg.setText("");
 				tab.panelPredict.startButton.setEnabled(true);
 				tab.panelPredict.executeButton.setEnabled(false);
+				tab.panelPredict.flag = true;
 			}
-			*/
+			
 			else {
 				//Printing error message
 				JOptionPane.showMessageDialog(this,answer);
