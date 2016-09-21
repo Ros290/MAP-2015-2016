@@ -265,6 +265,9 @@ public class RT extends JApplet {
 		in = new ObjectInputStream(socket.getInputStream()); 
 		}
 		catch(IOException e){
+			
+			System.out.println("Server non avviato!!!");
+			JOptionPane.showMessageDialog(this,"SERVER NON AVVIATO-Server offline!!!");
 			System.exit(0);
 		}
 	}
@@ -287,12 +290,22 @@ public class RT extends JApplet {
 				tab.panelDB.saveButton.setEnabled(true);
 				return;
 			}
+			else if (answer.equals("ERRORE")){
+				
+				tab.panelDB.outputMsg.setText((String)readObject(socket));
+				System.out.println("SALVATAGGIO SU FILE NON RIUSCITO!!!");
+				//tab.panelDB.outputMsg.setText("Regression tree learned!");
+				tab.panelDB.outputMsg.setText("Errore! - Tabella vuota!!!\n Reinserire il nome della tabella da apprendere");
+				JOptionPane.showMessageDialog(this,"TABELLA VUOTA!\n"+"Inserire nuovamente il nome della tabella");
+			    return;
+				
+			}
 			else 
 			{
 				System.out.println("SALVATAGGIO SU FILE NON RIUSCITO!!!");
 				//tab.panelDB.outputMsg.setText("Regression tree learned!");
-				tab.panelDB.outputMsg.setText("Errore! - Database non trovato o tabella vuota!!!\n Reinserire il nome della tabella da apprendere");
-				JOptionPane.showMessageDialog(this,"TABELLA INESISTENTE O VUOTA!\n"+"Inserire nuovamente il nome della tabella");
+				tab.panelDB.outputMsg.setText("Errore! - Tabella non trovata!!!\n Reinserire il nome della tabella da apprendere");
+				JOptionPane.showMessageDialog(this,"TABELLA INESISTENTE!\n"+"Inserire nuovamente il nome della tabella");
 			}
 		}
 		catch(IOException | ClassNotFoundException   e){

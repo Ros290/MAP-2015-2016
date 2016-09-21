@@ -75,14 +75,18 @@ class ServeOneClient extends Thread {
 						System.out.println("Salvataggio su file .dmp riuscito correttamente!!!");
 					}	
 					else
+					
 						System.out.println("Salvataggio su file .dmp non riuscito!!!");
 					}
 					
 					catch(IOException | ClassNotFoundException e){
 						e.printStackTrace();
+						
 					} catch (EmptySetException e){
 						
+						writeObject(socket,"ERRORE");
 						System.out.println("ResultSet vuoto!!!");
+												
 					}
 					catch (SQLException e){
 						System.out.println("Errore database: tabella inesistente!!!");
@@ -95,6 +99,8 @@ class ServeOneClient extends Thread {
 					{
 						System.out.println("Impossibile trovare il file specificato");
 					}
+					
+					
 					writeObject(socket,result);
 			       break;
 				
@@ -124,6 +130,7 @@ class ServeOneClient extends Thread {
 			  catch (IOException e) { flag=false;}
 			catch (UnknownValueException e) {flag = false;}
 		}
+		
 		try{
 			socket.close();
 			System.out.println("Server disponbile per un nuovo Client");
