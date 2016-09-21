@@ -291,8 +291,8 @@ public class RT extends JApplet {
 			{
 				System.out.println("SALVATAGGIO SU FILE NON RIUSCITO!!!");
 				//tab.panelDB.outputMsg.setText("Regression tree learned!");
-				tab.panelDB.outputMsg.setText("Errore! - Database non trovato!\n Reinserire il nome della tabella da apprendere");
-				JOptionPane.showMessageDialog(this,"TABELLA INESISTENTE!\n"+"Inserire nuovamente il nome della tabella");
+				tab.panelDB.outputMsg.setText("Errore! - Database non trovato o tabella vuota!!!\n Reinserire il nome della tabella da apprendere");
+				JOptionPane.showMessageDialog(this,"TABELLA INESISTENTE O VUOTA!\n"+"Inserire nuovamente il nome della tabella");
 			}
 		}
 		catch(IOException | ClassNotFoundException   e){

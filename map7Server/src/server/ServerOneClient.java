@@ -78,9 +78,23 @@ class ServeOneClient extends Thread {
 						System.out.println("Salvataggio su file .dmp non riuscito!!!");
 					}
 					
-					catch(IOException | ClassNotFoundException | TrainingDataException | DatabaseConnectionException | SQLException | EmptySetException e){
+					catch(IOException | ClassNotFoundException e){
+						e.printStackTrace();
+					} catch (EmptySetException e){
 						
-					} 
+						System.out.println("ResultSet vuoto!!!");
+					}
+					catch (SQLException e){
+						System.out.println("Errore database: tabella inesistente!!!");
+					}
+					catch(DatabaseConnectionException e)
+					{
+						System.out.println("Impossibile connettersi al database specificato");
+					}
+					catch(TrainingDataException e)
+					{
+						System.out.println("Impossibile trovare il file specificato");
+					}
 					writeObject(socket,result);
 			       break;
 				
