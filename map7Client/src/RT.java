@@ -291,6 +291,18 @@ public class RT extends JApplet {
 				tab.panelDB.saveButton.setEnabled(true);
 				return;
 			}
+			
+			else if (answer.equals("NOMENONINSERITO")){
+				
+
+				tab.panelDB.outputMsg.setText((String)readObject(socket));
+				System.out.println("SALVATAGGIO SU FILE NON RIUSCITO!!!");
+				//tab.panelDB.outputMsg.setText("Regression tree learned!");
+				tab.panelDB.outputMsg.setText("Errore! - Nome tabella non inserito!!!\n Inserire il nome della tabella da apprendere");
+				JOptionPane.showMessageDialog(this,"NOME TABELLA NON INSERITO!\n"+"Inserire il nome della tabella");
+				tab.panelDB.saveButton.setEnabled(false);
+				return;
+			 }
 			else if (answer.equals("ERRORE")){
 				
 				tab.panelDB.outputMsg.setText((String)readObject(socket));
@@ -298,15 +310,18 @@ public class RT extends JApplet {
 				//tab.panelDB.outputMsg.setText("Regression tree learned!");
 				tab.panelDB.outputMsg.setText("Errore! - Tabella vuota!!!\n Reinserire il nome della tabella da apprendere");
 				JOptionPane.showMessageDialog(this,"TABELLA VUOTA!\n"+"Inserire nuovamente il nome della tabella");
-			    return;
+				tab.panelDB.saveButton.setEnabled(false);
+				return;
 				
 			}
 			else 
 			{
+				
 				System.out.println("SALVATAGGIO SU FILE NON RIUSCITO!!!");
 				//tab.panelDB.outputMsg.setText("Regression tree learned!");
 				tab.panelDB.outputMsg.setText("Errore! - Tabella non trovata!!!\n Reinserire il nome della tabella da apprendere");
 				JOptionPane.showMessageDialog(this,"TABELLA INESISTENTE!\n"+"Inserire nuovamente il nome della tabella");
+				tab.panelDB.saveButton.setEnabled(false);
 			}
 		}
 		catch(IOException | ClassNotFoundException   e){
@@ -339,8 +354,8 @@ public class RT extends JApplet {
 			{
 				System.out.println("CARICAMENTO DA FILE NON RIUSCITO!!!");
 			   	//tab.panelFile.outputMsg.setText("Regression tree learned!");
-				tab.panelFile.outputMsg.setText("Errore! - File inesistente!\n Reinseirire il nome del file da caricare");
-				JOptionPane.showMessageDialog(this,"FILE INESISTENTE!\n"+"Inserire nuovamente il nome del file");
+				tab.panelFile.outputMsg.setText("Errore! - File inesistente o nome file non inserito!\n Reinseirire il nome del file da caricare");
+				JOptionPane.showMessageDialog(this,"FILE INESISTENTE O NON INSERITO!\n"+"Inserire nuovamente il nome del file");
 			}
 		}
 		catch(IOException | ClassNotFoundException e){

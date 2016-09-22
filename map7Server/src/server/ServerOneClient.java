@@ -1,10 +1,16 @@
-package server;
+
+				package server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
+
+
+
+
+import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 
 import tree.RegressionTree;
 import data.Data;
@@ -88,7 +94,15 @@ class ServeOneClient extends Thread {
 						System.out.println("ResultSet vuoto!!!");
 												
 					}
-					catch (SQLException e){
+					catch (MySQLSyntaxErrorException e)
+					{
+						writeObject(socket,"NOMENONINSERITO");
+						System.out.println("Errore database: nome tabella non inserito!!!");
+					}
+					
+					catch (SQLException e)
+					{
+					
 						System.out.println("Errore database: tabella inesistente!!!");
 					}
 					catch(DatabaseConnectionException e)
@@ -115,7 +129,7 @@ class ServeOneClient extends Thread {
 					}
 					catch(IOException | ClassNotFoundException e){
 						
-					} 
+					}
 					
 					writeObject(socket,result);
 				break;	
