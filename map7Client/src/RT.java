@@ -119,6 +119,7 @@ public class RT extends JApplet {
 				middlePanel.setLayout(new FlowLayout());
 				//middlePanel.add(new JLabel("Choise:"));
 				//middlePanel.add(answer);
+				executeButton.setEnabled(false);
 				startButton.addActionListener(aStart);
 				executeButton.addActionListener(aContinue);
 				middlePanel.add(startButton);
@@ -381,7 +382,8 @@ public class RT extends JApplet {
 			
 			if(answer.equals("QUERY"))
 			{
-					
+				
+				tab.panelPredict.executeButton.setEnabled(true);
 				answer=readObject(socket).toString();
 				DefaultMutableTreeNode root = new DefaultMutableTreeNode ("ROOT");
 				int startString;
@@ -406,14 +408,18 @@ public class RT extends JApplet {
 					childs [i] = new DefaultMutableTreeNode (listNodes.get(i));
 					root.add(childs[i]);
 				}
-				
-				tab.panelPredict.tree = new JTree(root);
 				if (!tab.panelPredict.flag)
+				{
+					tab.panelPredict.tree = new JTree(root);
 					tab.panelPredict.queryMsg.add(tab.panelPredict.tree);
+				}
 				else
 				{
 					DefaultTreeModel model = (DefaultTreeModel)tab.panelPredict.tree.getModel();
-					DefaultMutableTreeNode newRoot = (DefaultMutableTreeNode) root;
+					DefaultMutableTreeNode newRoot = (DefaultMutableTreeNode) model.getRoot();
+					newRoot.removeAllChildren();
+					while (root.getChildCount()!=0)
+						newRoot.add((DefaultMutableTreeNode)root.getChildAt(0));
 					model.reload(newRoot);
 				}
 
