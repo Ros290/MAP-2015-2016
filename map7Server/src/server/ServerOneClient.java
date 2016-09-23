@@ -54,6 +54,7 @@ class ServeOneClient extends Thread {
 	{
 		String result = "";
 		String nome = "";
+		boolean esito = false;
 		Object o;
 		boolean flag=true;
 		
@@ -69,55 +70,36 @@ class ServeOneClient extends Thread {
 				
 				case 1:
 					// LEARNING A REGRESSION TREE AND SERIALIZE THE CURRENT REGRESSION TREE ON A FILE
-					try{					
+					try
+					{	
+						esito = false;
 						nome = (String)readObject(socket);
 						Data TrainingSet = new Data(nome);	
-						tree = new RegressionTree(TrainingSet);
-						writeObject(socket,"OK");
+						tree = new RegressionTree(TrainingSet);														
+						if( tree != null) 
+						{
+							tree.salva(nome);
+							System.out.println("Salvataggio su file .dmp riuscito correttamente!!!");
+						}	
+						else
+							System.out.println("Salvataggio su file .dmp non riuscito!!!");
 						result = new String (tree.printRules() + tree.printTree());
-																				
-					if( tree != null) {
-						tree.salva(nome);
-						System.out.println("Salvataggio su file .dmp riuscito correttamente!!!");
-					}	
-					else
-					
-						System.out.println("Salvataggio su file .dmp non riuscito!!!");
+						esito = true;
 					}
-					
-					catch(IOException | ClassNotFoundException e){
-						e.printStackTrace();
-						
-					} catch (EmptySetException e){
-						
-						writeObject(socket,"ERRORE");
-						System.out.println("ResultSet vuoto!!!");
-												
-					}
-					catch (MySQLSyntaxErrorException e)
+					catch (IOException | ClassNotFoundException | EmptySetException | SQLException |DatabaseConnectionException | TrainingDataException e)
 					{
-						writeObject(socket,"NOMENONINSERITO");
-						System.out.println("Errore database: nome tabella non inserito!!!");
+						result = e.toString();
 					}
 					
-					catch (SQLException e)
+					finally
 					{
-					
-						System.out.println("Errore database: tabella inesistente!!!");
+						if (esito)
+							writeObject (socket,"OK");
+						else
+							writeObject (socket,"ERR");
+						writeObject (socket, result);
 					}
-					catch(DatabaseConnectionException e)
-					{
-						System.out.println("Impossibile connettersi al database specificato");
-					}
-					catch(TrainingDataException e)
-					{
-						System.out.println("Impossibile trovare il file specificato");
-					}
-					
-					
-					writeObject(socket,result);
-			       break;
-				
+					break;
 				case 2:
 					// STORE THE REGRESSION TREE FROM FILE
 					try{

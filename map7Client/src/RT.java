@@ -274,63 +274,37 @@ public class RT extends JApplet {
 	}
 	
 	void learningFromDBAction(){
-		try{
+		try
+		{
 			if (!tab.panelPredict.isPredicting)
 			{
-			tab.panelDB.outputMsg.setText("Working ....");
-			tab.panelDB.saveButton.setEnabled(true);
-			// learning tree
-			System.out.println("Starting learning phase!");
-			writeObject(socket,1);
-			String nomeTab = tab.panelDB.tableText.getText();
-			writeObject(socket,nomeTab);
-			String answer=readObject(socket).toString();
-			if(answer.equals("OK"))
-			{
-				tab.panelDB.outputMsg.setText((String)readObject(socket));
-				System.out.println("Caricamento da DB effettuato correttamente...");
-				JOptionPane.showMessageDialog(this,"Caricamento da DB e salvataggio su file .dmp effettuati correttamente!!!");
-				tab.panelDB.saveButton.setEnabled(true);
-				return;
-			}
-			
-			else if (answer.equals("NOMENONINSERITO")){
-				
-
-				tab.panelDB.outputMsg.setText((String)readObject(socket));
-				System.out.println("SALVATAGGIO SU FILE NON RIUSCITO!!!");
-				//tab.panelDB.outputMsg.setText("Regression tree learned!");
-				tab.panelDB.outputMsg.setText("Errore! - Nome tabella non inserito!!!\n Inserire il nome della tabella da apprendere");
-				JOptionPane.showMessageDialog(this,"NOME TABELLA NON INSERITO!\n"+"Inserire il nome della tabella");
+				tab.panelDB.outputMsg.setText("Working ....");
 				tab.panelDB.saveButton.setEnabled(false);
-				return;
-			 }
-			else if (answer.equals("ERRORE")){
-				
-				tab.panelDB.outputMsg.setText((String)readObject(socket));
-				System.out.println("SALVATAGGIO SU FILE NON RIUSCITO!!!");
-				//tab.panelDB.outputMsg.setText("Regression tree learned!");
-				tab.panelDB.outputMsg.setText("Errore! - Tabella vuota!!!\n Reinserire il nome della tabella da apprendere");
-				JOptionPane.showMessageDialog(this,"TABELLA VUOTA!\n"+"Inserire nuovamente il nome della tabella");
-				tab.panelDB.saveButton.setEnabled(false);
-				return;
-				
-			}
-			else 
-			{
-				
-				System.out.println("SALVATAGGIO SU FILE NON RIUSCITO!!!");
-				//tab.panelDB.outputMsg.setText("Regression tree learned!");
-				tab.panelDB.outputMsg.setText("Errore! - Tabella non trovata!!!\n Reinserire il nome della tabella da apprendere");
-				JOptionPane.showMessageDialog(this,"TABELLA INESISTENTE!\n"+"Inserire nuovamente il nome della tabella");
-				tab.panelDB.saveButton.setEnabled(false);
-			}
+				// learning tree
+				System.out.println("Starting learning phase!");
+				writeObject(socket,1);
+				String nomeTab = tab.panelDB.tableText.getText();
+				writeObject(socket,nomeTab);
+				String answer=readObject(socket).toString();
+				if(answer.equals("OK"))
+				{
+					tab.panelDB.outputMsg.setText((String)readObject(socket));
+					System.out.println("Caricamento da DB effettuato correttamente...");
+					JOptionPane.showMessageDialog(this,"Caricamento da DB e salvataggio su file .dmp effettuati correttamente!!!");
+					tab.panelDB.saveButton.setEnabled(true);
+					return;
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(this,(String)readObject(socket));
+					tab.panelDB.saveButton.setEnabled(false);
+				}
 			}
 			else
 				JOptionPane.showMessageDialog(this,"PREDIZIONE IN CORSO!\n"+"Impossibile impostare una nuova tabella fino al termine della operazione");
 		}
 		catch(IOException | ClassNotFoundException   e){
-			tab.panelDB.outputMsg.setText(e.toString());
+			JOptionPane.showMessageDialog(this,e.toString());
 		}
 		
 		
