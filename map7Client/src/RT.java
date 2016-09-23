@@ -102,7 +102,8 @@ public class RT extends JApplet {
 			private JButton executeButton=new JButton("CONTINUE");
 			private JLabel predictedClass = new JLabel("");
 			private JTree tree = new JTree();
-			private boolean flag = false;
+			private boolean firstPred = true;
+			private boolean isPredicting = false;
 			
 			
 			JPanelPredicting( java.awt.event.ActionListener aStart, java.awt.event.ActionListener aContinue){
@@ -228,7 +229,6 @@ public class RT extends JApplet {
 				}
 			});
 	        tabbedPane.addTab("PREDICT", iconPredict, panelPredict, "Does nothing");
-	        
 	        //Add the tabbed pane to this panel.
 	        add(tabbedPane);         
 	        //The following line enables to use scrolling tabs.
@@ -275,9 +275,11 @@ public class RT extends JApplet {
 	
 	void learningFromDBAction(){
 		try{
+			if (!tab.panelPredict.isPredicting)
+			{
 			tab.panelDB.outputMsg.setText("Working ....");
 			tab.panelDB.saveButton.setEnabled(true);
-			// learning tree		
+			// learning tree
 			System.out.println("Starting learning phase!");
 			writeObject(socket,1);
 			String nomeTab = tab.panelDB.tableText.getText();
@@ -308,6 +310,9 @@ public class RT extends JApplet {
 				tab.panelDB.outputMsg.setText("Errore! - Tabella non trovata!!!\n Reinserire il nome della tabella da apprendere");
 				JOptionPane.showMessageDialog(this,"TABELLA INESISTENTE!\n"+"Inserire nuovamente il nome della tabella");
 			}
+			}
+			else
+				JOptionPane.showMessageDialog(this,"PREDIZIONE IN CORSO!\n"+"Impossibile impostare una nuova tabella fino al termine della operazione");
 		}
 		catch(IOException | ClassNotFoundException   e){
 			tab.panelDB.outputMsg.setText(e.toString());
@@ -319,7 +324,9 @@ public class RT extends JApplet {
 	
 	
 	void learningFromFileAction(){
-		try{	
+		try{
+			if (!tab.panelPredict.isPredicting)
+			{
 			tab.panelFile.outputMsg.setText("Working ....");
 			// store from file
 			System.out.println("Starting learning phase!");
@@ -342,6 +349,9 @@ public class RT extends JApplet {
 				tab.panelFile.outputMsg.setText("Errore! - File inesistente!\n Reinseirire il nome del file da caricare");
 				JOptionPane.showMessageDialog(this,"FILE INESISTENTE!\n"+"Inserire nuovamente il nome del file");
 			}
+			}
+			else
+				JOptionPane.showMessageDialog(this,"PREDIZIONE IN CORSO!\n"+"Impossibile impostare una nuova tabella fino al termine della operazione");
 		}
 		catch(IOException | ClassNotFoundException e){
 			tab.panelFile.outputMsg.setText(e.toString());
@@ -382,7 +392,7 @@ public class RT extends JApplet {
 			
 			if(answer.equals("QUERY"))
 			{
-				
+				tab.panelPredict.isPredicting = true;
 				tab.panelPredict.executeButton.setEnabled(true);
 				answer=readObject(socket).toString();
 				DefaultMutableTreeNode root = new DefaultMutableTreeNode ("ROOT");
@@ -408,13 +418,14 @@ public class RT extends JApplet {
 					childs [i] = new DefaultMutableTreeNode (listNodes.get(i));
 					root.add(childs[i]);
 				}
-				if (!tab.panelPredict.flag)
+				if (tab.panelPredict.firstPred)
 				{
 					tab.panelPredict.tree = new JTree(root);
 					tab.panelPredict.queryMsg.add(tab.panelPredict.tree);
 				}
 				else
 				{
+					tab.panelPredict.predictedClass.setText("");
 					DefaultTreeModel model = (DefaultTreeModel)tab.panelPredict.tree.getModel();
 					DefaultMutableTreeNode newRoot = (DefaultMutableTreeNode) model.getRoot();
 					newRoot.removeAllChildren();
@@ -531,12 +542,13 @@ public class RT extends JApplet {
 
 			else if(answer.equals("OK"))
 			{ 
+				tab.panelPredict.isPredicting = false;
 				answer=readObject(socket).toString();
 				tab.panelPredict.predictedClass.setText("Predicted class:"+answer);
 				//tab.panelPredict.queryMsg.setText("");
 				tab.panelPredict.startButton.setEnabled(true);
 				tab.panelPredict.executeButton.setEnabled(false);
-				tab.panelPredict.flag = true;
+				tab.panelPredict.firstPred = false;
 			}
 			
 			else {
@@ -639,3 +651,4 @@ public class RT extends JApplet {
 		catch (Exception e) {}
 	}
 }
+
