@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import exception.EmptySetException;
+import exception.TrainingDataException;
+import exception.UnknownValueException;
 
 public class TableData {
 
@@ -19,7 +21,9 @@ public class TableData {
 		this.db=db;
 	}
 
-	public List<Example> getTransazioni(String table) throws SQLException, EmptySetException{
+	public List<Example> getTransazioni(String table) throws SQLException, EmptySetException, TrainingDataException, UnknownValueException{
+		if (table.isEmpty())
+			throw new UnknownValueException();
 		LinkedList<Example> transSet = new LinkedList<Example>();
 		Statement statement;
 		TableSchema tSchema=new TableSchema(db,table);
@@ -34,7 +38,7 @@ public class TableData {
 		}
 		
 		if(tSchema.getNumberOfAttributes()==0)
-			throw new SQLException();
+			throw new TrainingDataException();
 		query += (" FROM "+table);
 		
 

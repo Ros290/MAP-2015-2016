@@ -86,7 +86,7 @@ class ServeOneClient extends Thread {
 						result = new String (tree.printRules() + tree.printTree());
 						esito = true;
 					}
-					catch (IOException | ClassNotFoundException | EmptySetException | SQLException |DatabaseConnectionException | TrainingDataException e)
+					catch (Exception e)
 					{
 						result = e.toString();
 					}

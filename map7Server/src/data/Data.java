@@ -14,6 +14,7 @@ import database.TableSchema;
 import exception.DatabaseConnectionException;
 import exception.EmptySetException;
 import exception.TrainingDataException;
+import exception.UnknownValueException;
 
 
 //Classe che modella l'insieme degli esempi di training 
@@ -36,6 +37,7 @@ public class Data implements Serializable
      * Avvalora explanatorySet, avvalora classAttribue, avvalora il numero di esempi e popola data con gli esempi di taining 
      *
      * @param tableName nome del file contenente i dati
+	 * @throws UnknownValueException 
      * @throw FileNotFoundException se il file non esiste
      * @throw TrainingDataException
      * @throw ClassNotFoundException
@@ -43,7 +45,7 @@ public class Data implements Serializable
      * @throw SQLException
      * @throw EmptySetException
      */
-	public Data(String tableName)throws FileNotFoundException, TrainingDataException, ClassNotFoundException, DatabaseConnectionException, SQLException, EmptySetException
+	public Data(String tableName)throws FileNotFoundException, TrainingDataException, ClassNotFoundException, DatabaseConnectionException, SQLException, EmptySetException, UnknownValueException
 	{
 		int i;
 		DbAccess db = new DbAccess();
