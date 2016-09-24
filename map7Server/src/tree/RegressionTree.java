@@ -242,7 +242,7 @@ public class RegressionTree implements Serializable
 				{
 					if (!rule.equals("") && i == 0)
 						rule += " AND ";
-					rule2 += childTree[i].printRules2( rule + sn.getAttribute().getName() + " = " + sn.getSplitInfo(i).getSplitValue().toString());
+					rule2 += childTree[i].printRules2( rule + sn.getAttribute().getName() + sn.getSplitInfo(i).getComparator() + sn.getSplitInfo(i).getSplitValue().toString());
 				}
 			}
 			return rule2;
@@ -328,7 +328,6 @@ public class RegressionTree implements Serializable
 				//mostro quali sono i percorsi possibili per continuare la predizione
 				writeObject(socket,"QUERY");
 				writeObject(socket,sn.formulateQuery());
-				//int choice = Integer.parseInt((String)readObject(socket));
 				int choice = (int)readObject(socket);
 				if ((choice < 0) || (choice >= childTree.length))
 					throw new UnknownValueException("The answer should be an integer between 0 and "+(childTree.length-1)+"!");

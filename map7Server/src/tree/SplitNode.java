@@ -108,7 +108,7 @@ public abstract class SplitNode extends Node implements Comparable<SplitNode>
 		 *
 		 *@return operatore matematio che definisce il test
 		 */
-		String getComparator()
+		public String getComparator()
 		{
 			return comparator;
 		}

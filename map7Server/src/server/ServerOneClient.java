@@ -104,9 +104,9 @@ class ServeOneClient extends Thread {
 						
 					
 					}
-					catch ( IOException e)
+					catch ( Exception e)
 					{
-						result = e.toString()+ " Errore: valore mancante o fuori range per l'attributo!";
+						result = e.toString();
 						
 					}
 					
@@ -122,16 +122,23 @@ class ServeOneClient extends Thread {
 					
 					
 				break;	
-					
+					//PREDICTION
 				case 3:
-					//USE THE CURRENT TREE TO PREDICT AN EXAMPLE
-					writeObject(socket,tree.predictClass(socket).toString());
+					try
+					{
+						writeObject(socket,tree.predictClass(socket).toString());
+					}
+					
+					/*
+					 * Poichè il client è "costretto" a far passare unicamente i valori che gli vengono mostrati
+					 * questa eccezzione, in questo caso, è inutile
+					 */
+					catch (UnknownValueException e)
+					{}
 					break;
 					
 				}
-			} catch (ClassNotFoundException e) {flag=false;} 
-			  catch (IOException e) { flag=false;}
-			catch (UnknownValueException e) {flag = false;}
+			} catch (ClassNotFoundException | IOException e) {flag=false;} 
 		}
 		
 		try{

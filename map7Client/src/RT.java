@@ -97,9 +97,7 @@ public class RT extends JApplet {
 		
 		
 		private class JPanelPredicting extends JPanel{
-			//private JTextArea queryMsg=new JTextArea(4,50);
 			private JPanel queryMsg = new JPanel ();
-			//private JTextField answer=new JTextField(20);
 			private JButton startButton=new JButton("START");
 			private JLabel predictedClass = new JLabel("");
 			private JTree tree = new JTree();
@@ -122,10 +120,8 @@ public class RT extends JApplet {
 				
 				JPanel  middlePanel=new JPanel();
 				middlePanel.setLayout(new FlowLayout());
-				//middlePanel.add(new JLabel("Choise:"));
-				//middlePanel.add(answer);
+				startButton.setEnabled(false);
 				startButton.addActionListener(aStart);
-				//executeButton.addActionListener(aContinue);
 				tree.addMouseListener(aContinue);
 				middlePanel.add(startButton);
 				add(middlePanel);
@@ -223,17 +219,14 @@ public class RT extends JApplet {
 	        ImageIcon iconPredict = new ImageIcon(imgURL);
 			panelPredict = new JPanelPredicting(new java.awt.event.ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					System.out.println("start");
 						startPredictingAction();
 				}
 		      },
 		      new MouseAdapter() {
 		          public void mouseClicked(MouseEvent e) {
-		        	  System.out.println("continue");
 		              if (e.getClickCount() == 2) {
 		                  DefaultMutableTreeNode node = (DefaultMutableTreeNode) tab.panelPredict.tree.getLastSelectedPathComponent();
-		                  if ((node == null) || (!node.isLeaf())) return;
-		                  continuePredictingAction();
+		                  if ((node != null) && (node.isLeaf()) && (tab.panelPredict.isPredicting)) continuePredictingAction();
 		              }
 		          }
 		      });
@@ -262,7 +255,6 @@ public class RT extends JApplet {
 		
 		String ip=this.getParameter("ServerIP");
 		
-		//int port=new Integer(this.getParameter("Port")).intValue();
 		System.out.println("port");
 		try
 		{
@@ -301,6 +293,7 @@ public class RT extends JApplet {
 					System.out.println("Caricamento da DB effettuato correttamente...");
 					JOptionPane.showMessageDialog(this,"Caricamento da DB e salvataggio su file .dmp effettuati correttamente!!!");
 					tab.panelDB.saveButton.setEnabled(true);
+					tab.panelPredict.startButton.setEnabled(true);
 					return;
 				}
 				else
@@ -338,15 +331,12 @@ public class RT extends JApplet {
 				System.out.println("Caricamneto da File riuscito correttamente...");
 				JOptionPane.showMessageDialog(this,"File caricato correttamente!!!");
 				tab.panelFile.saveButton.setEnabled(true);
+				tab.panelPredict.startButton.setEnabled(true);
 				return;
 			}
 			else 
 			{
 				System.out.println("CARICAMENTO DA FILE NON RIUSCITO!!!");
-			   	//tab.panelFile.outputMsg.setText("Regression tree learned!");
-				/*tab.panelFile.outputMsg.setText("Errore! - File inesistente o nome file non inserito!\n Reinseirire il nome del file da caricare");
-				JOptionPane.showMessageDialog(this,"FILE INESISTENTE O NON INSERITO!\n"+"Inserire nuovamente il nome del file");
-				*/
 				JOptionPane.showMessageDialog(this,(String)readObject(socket));
 				tab.panelFile.saveButton.setEnabled(false);
 			}
@@ -366,32 +356,7 @@ public class RT extends JApplet {
 			tab.panelPredict.startButton.setEnabled(false);			
 			writeObject(socket,3);
 			System.out.println("Starting prediction phase!");
-			String answer=readObject(socket).toString();
-			
-			/*
-			if(answer.equals("QUERY")){
-				// Formualting query, reading answer
-				answer=readObject(socket).toString();
-				tab.panelPredict.queryMsg.setText(answer);
-				tab.panelPredict.executeButton.setEnabled(true);
-			}
-			else
-			if(answer.equals("OK")){ 
-				// Reading prediction
-				answer=readObject(socket).toString();
-				tab.panelPredict.predictedClass.setText("Predicted class:"+answer);
-				tab.panelPredict.queryMsg.setText("");
-				tab.panelPredict.startButton.setEnabled(true);
-				tab.panelPredict.executeButton.setEnabled(false);
-			}
-			else {
-				//Printing error message
-				tab.panelPredict.queryMsg.setText(answer);
-				tab.panelPredict.startButton.setEnabled(true);
-				tab.panelPredict.executeButton.setEnabled(false);
-			}
-			*/
-			
+			String answer=readObject(socket).toString();			
 			if(answer.equals("QUERY"))
 			{
 				tab.panelPredict.isPredicting = true;
@@ -400,7 +365,6 @@ public class RT extends JApplet {
 				int startString;
 				int spaceString;
 				String subString = "";
-				
 				List <String> listNodes = new ArrayList<String> ();
 				while (answer.length() > 0)
 				{
@@ -410,15 +374,14 @@ public class RT extends JApplet {
 					listNodes.add(subString);
 					answer = answer.substring(spaceString+1);
 				}
-				
 				int n = listNodes.size();
 				DefaultMutableTreeNode childs [] = new DefaultMutableTreeNode [n];
-				
 				for (int i = 0; i < n ; i++)
 				{
 					childs [i] = new DefaultMutableTreeNode (listNodes.get(i));
 					root.add(childs[i]);
 				}
+				tab.panelPredict.predictedClass.setText("*** Phase Prediction started ***");
 				if (tab.panelPredict.firstPred)
 				{
 					DefaultTreeModel model = (DefaultTreeModel)tab.panelPredict.tree.getModel();
@@ -432,10 +395,21 @@ public class RT extends JApplet {
 					DefaultMutableTreeNode newRoot = (DefaultMutableTreeNode) model.getRoot();
 					newRoot.removeAllChildren();
 					while (root.getChildCount()!=0)
-						newRoot.add((DefaultMutableTreeNode)root.getChildAt(root.getChildCount() - 1));
+						newRoot.add((DefaultMutableTreeNode)root.getChildAt(0));
 					model.reload(newRoot);
 				}
-
+			}
+			else if(answer.equals("OK"))
+			{ 
+				tab.panelPredict.isPredicting = false;
+				answer=readObject(socket).toString();
+				tab.panelPredict.predictedClass.setText("Predicted class:"+answer);
+				tab.panelPredict.startButton.setEnabled(true);
+			}
+			else {
+				//Printing error message
+				JOptionPane.showMessageDialog(this,answer);
+				tab.panelPredict.startButton.setEnabled(true);
 			}
 		}
 		catch(IOException | ClassNotFoundException e){
@@ -445,41 +419,6 @@ public class RT extends JApplet {
 		}
 	}
 	
-	/*
-	void continuePredictingAction(){
-		//TO BE DEFINED	
-		
-		try{		
-			writeObject(socket,new Integer(tab.panelPredict.answer.getText()));
-			System.out.println("Continuing prediction phase!");
-			String answer=readObject(socket).toString();
-			
-			if(answer.equals("QUERY")){
-				answer=readObject(socket).toString();
-				tab.panelPredict.queryMsg.setText(answer);
-				tab.panelPredict.executeButton.setEnabled(true);
-				tab.panelPredict.startButton.setEnabled(false);
-			}
-			else
-			if(answer.equals("OK")){ 
-				answer=readObject(socket).toString();
-				tab.panelPredict.predictedClass.setText("Predicted class:"+answer);
-				tab.panelPredict.queryMsg.setText("");
-				tab.panelPredict.startButton.setEnabled(true);
-				tab.panelPredict.executeButton.setEnabled(false);
-			}
-			else {
-				//Printing error message
-				tab.panelPredict.queryMsg.setText(answer);
-				tab.panelPredict.startButton.setEnabled(false);
-				tab.panelPredict.executeButton.setEnabled(true);
-			}
-		}
-		catch(IOException | ClassNotFoundException e){
-			tab.panelPredict.queryMsg.setText(e.toString());
-		}
-		*/
-	
 	void continuePredictingAction()
 	{
 		try
@@ -488,29 +427,24 @@ public class RT extends JApplet {
 			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
 			int choice = parent.getIndex(node);
 			int nChildren = parent.getChildCount() -1;
-			
 			while (nChildren >= 0 )
 			{
 				if (nChildren != choice)
 					parent.remove(nChildren);
 				nChildren --;
 			}
-			
 			DefaultTreeModel model = (DefaultTreeModel)tab.panelPredict.tree.getModel();
 			DefaultMutableTreeNode root = (DefaultMutableTreeNode) parent;
 			model.reload(root);
-			
 			writeObject(socket,new Integer(choice));
 			System.out.println("Continuing prediction phase!");
 			String answer=readObject(socket).toString();
-			
 			if(answer.equals("QUERY"))
 			{
 				answer=readObject(socket).toString();
 				int startString;
 				int spaceString;
 				String subString = "";
-				
 				List <String> listNodes = new ArrayList<String> ();
 				while (answer.length() > 0)
 				{
@@ -520,47 +454,33 @@ public class RT extends JApplet {
 					listNodes.add(subString);
 					answer = answer.substring(spaceString+1);
 				}
-				
 				int n = listNodes.size();
 				DefaultMutableTreeNode childs [] = new DefaultMutableTreeNode [n];
-				//root = (DefaultMutableTreeNode) node;
-				
 				for (int i = 0; i < n ; i++)
 				{
 					childs [i] = new DefaultMutableTreeNode (listNodes.get(i));
 					node.add(childs[i]);
-					//root.add(childs[i]);
-					
 				}
-				
-				//root.add(new DefaultMutableTreeNode("another_child"));
 				model.reload(root);
 				tab.panelPredict.tree.expandPath(new TreePath(node.getPath()));
-
 			}
-
 			else if(answer.equals("OK"))
 			{ 
 				tab.panelPredict.isPredicting = false;
 				answer=readObject(socket).toString();
 				tab.panelPredict.predictedClass.setText("Predicted class:"+answer);
-				//tab.panelPredict.queryMsg.setText("");
 				tab.panelPredict.startButton.setEnabled(true);
 				tab.panelPredict.firstPred = false;
 			}
-			
 			else {
 				//Printing error message
 				JOptionPane.showMessageDialog(this,answer);
-				tab.panelPredict.startButton.setEnabled(false);
-			}
-			
+				tab.panelPredict.startButton.setEnabled(true);
+			}	
 		}
 		catch(IOException | ClassNotFoundException e){
 			JOptionPane.showMessageDialog(this,e.toString());
 		}
-		
-		
 	}
 	
 	
@@ -610,7 +530,6 @@ public class RT extends JApplet {
 					lastSpace = -1;
 	            }
 	        }
-
 	        contentStream.beginText();
 	        contentStream.setFont(pdfFont, fontSize);
 	        contentStream.moveTextPositionByAmount(startX, startY + margin - center);
@@ -621,22 +540,6 @@ public class RT extends JApplet {
 	            contentStream.moveTextPositionByAmount(0, -leading);
 	        }
 	        contentStream.endText(); 
-
-			/*
-			try 
-			{
-				File f = new File (img);
-				BufferedImage awtImage = ImageIO.read(f);
-				PDXObjectImage ximage = new PDPixelMap(doc, awtImage);
-				float scale = 0.5f; // alter this value to set the image size
-	        	contentStream.drawXObject(ximage, 100, 400, ximage.getWidth()*scale, ximage.getHeight()*scale);
-			} 
-	    
-			catch (FileNotFoundException fnfex) 
-			{
-				System.out.println("No image for you");
-			}
-			*/
 			contentStream.close();
 			doc.save(title);
 			doc.close();
@@ -648,7 +551,8 @@ public class RT extends JApplet {
 		catch (Exception e) {}
 	}
 	
-	public void mouseClicked(MouseEvent e) { 
+	public void mouseClicked(MouseEvent e) 
+	{ 
 	    if (e.getClickCount() == 1) {
 	    	tab.panelPredict.singleClick = true;
 	    	tab.panelPredict.timer.start();
