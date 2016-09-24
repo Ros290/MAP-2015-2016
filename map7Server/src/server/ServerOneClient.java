@@ -1,22 +1,14 @@
 
 				package server;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.sql.SQLException;
-
-
-
-
-import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 
 import tree.RegressionTree;
 import data.Data;
-import exception.DatabaseConnectionException;
-import exception.EmptySetException;
-import exception.TrainingDataException;
 import exception.UnknownValueException;
 
 class ServeOneClient extends Thread {
@@ -103,17 +95,32 @@ class ServeOneClient extends Thread {
 				case 2:
 					// STORE THE REGRESSION TREE FROM FILE
 					try{
+						esito = false;
 						nome = (String)readObject(socket);
 						tree = RegressionTree.carica(nome);
 						System.out.println("Caricamento da file .dmp riuscito correttamente!!!");
-						writeObject(socket,"OK"); 
 						result = new String(tree.printRules() + tree.printTree());
+						esito = true;
+						
+					
 					}
-					catch(IOException | ClassNotFoundException e){
+					catch ( IOException e)
+					{
+						result = e.toString()+ " Errore: valore mancante o fuori range per l'attributo!";
 						
 					}
 					
-					writeObject(socket,result);
+					
+					finally
+					{
+						if (esito)
+							writeObject (socket,"OK");
+						else
+							writeObject (socket,"ERR");
+						writeObject (socket, result);
+					}
+					
+					
 				break;	
 					
 				case 3:

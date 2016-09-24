@@ -13,7 +13,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +29,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -38,13 +41,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-
-import javax.swing.JFrame;
-import javax.swing.JTree;
-import javax.swing.SwingUtilities;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 
 public class RT extends JApplet {
 
@@ -281,7 +277,7 @@ public class RT extends JApplet {
 		catch(IOException e){
 			
 			System.out.println("Server non avviato!!!");
-			JOptionPane.showMessageDialog(this,"SERVER NON AVVIATO-Server offline!!!");
+			JOptionPane.showMessageDialog(this,e.toString()+ " SERVER OFFLINE!!!");
 			System.exit(0);
 		}
 	}
@@ -348,8 +344,11 @@ public class RT extends JApplet {
 			{
 				System.out.println("CARICAMENTO DA FILE NON RIUSCITO!!!");
 			   	//tab.panelFile.outputMsg.setText("Regression tree learned!");
-				tab.panelFile.outputMsg.setText("Errore! - File inesistente o nome file non inserito!\n Reinseirire il nome del file da caricare");
+				/*tab.panelFile.outputMsg.setText("Errore! - File inesistente o nome file non inserito!\n Reinseirire il nome del file da caricare");
 				JOptionPane.showMessageDialog(this,"FILE INESISTENTE O NON INSERITO!\n"+"Inserire nuovamente il nome del file");
+				*/
+				JOptionPane.showMessageDialog(this,(String)readObject(socket));
+				tab.panelFile.saveButton.setEnabled(false);
 			}
 			}
 			else
@@ -357,6 +356,7 @@ public class RT extends JApplet {
 		}
 		catch(IOException | ClassNotFoundException e){
 			tab.panelFile.outputMsg.setText(e.toString());
+			JOptionPane.showMessageDialog(this,e.toString());
 		}
 	}
 	
@@ -439,7 +439,7 @@ public class RT extends JApplet {
 			}
 		}
 		catch(IOException | ClassNotFoundException e){
-			//tab.panelPredict.queryMsg.setText(e.toString());
+			
 			JOptionPane.showMessageDialog(this,e.toString());
 			tab.panelPredict.startButton.setEnabled(true);
 		}
