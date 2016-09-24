@@ -4,15 +4,20 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.management.timer.Timer;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JApplet;
@@ -39,6 +44,7 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 public class RT extends JApplet {
 
@@ -99,14 +105,16 @@ public class RT extends JApplet {
 			private JPanel queryMsg = new JPanel ();
 			//private JTextField answer=new JTextField(20);
 			private JButton startButton=new JButton("START");
-			private JButton executeButton=new JButton("CONTINUE");
 			private JLabel predictedClass = new JLabel("");
 			private JTree tree = new JTree();
 			private boolean firstPred = true;
 			private boolean isPredicting = false;
+		    private boolean singleClick  = true;
+		    private int doubleClickDelay = 300;
+		    private Timer timer;    
 			
 			
-			JPanelPredicting( java.awt.event.ActionListener aStart, java.awt.event.ActionListener aContinue){
+			JPanelPredicting( java.awt.event.ActionListener aStart, MouseListener aContinue){
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 				JPanel  upPanel=new JPanel();
 				queryMsg.setPreferredSize(new Dimension (512,256));
@@ -120,11 +128,10 @@ public class RT extends JApplet {
 				middlePanel.setLayout(new FlowLayout());
 				//middlePanel.add(new JLabel("Choise:"));
 				//middlePanel.add(answer);
-				executeButton.setEnabled(false);
 				startButton.addActionListener(aStart);
-				executeButton.addActionListener(aContinue);
+				//executeButton.addActionListener(aContinue);
+				tree.addMouseListener(aContinue);
 				middlePanel.add(startButton);
-				middlePanel.add(executeButton);
 				add(middlePanel);
 				
 				JPanel  downPanel=new JPanel();
@@ -220,14 +227,20 @@ public class RT extends JApplet {
 	        ImageIcon iconPredict = new ImageIcon(imgURL);
 			panelPredict = new JPanelPredicting(new java.awt.event.ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					System.out.println("start");
 						startPredictingAction();
 				}
 		      },
-			new java.awt.event.ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-						continuePredictingAction();		
-				}
-			});
+		      new MouseAdapter() {
+		          public void mouseClicked(MouseEvent e) {
+		        	  System.out.println("continue");
+		              if (e.getClickCount() == 2) {
+		                  DefaultMutableTreeNode node = (DefaultMutableTreeNode) tab.panelPredict.tree.getLastSelectedPathComponent();
+		                  if ((node == null) || (!node.isLeaf())) return;
+		                  continuePredictingAction();
+		              }
+		          }
+		      });
 	        tabbedPane.addTab("PREDICT", iconPredict, panelPredict, "Does nothing");
 	        //Add the tabbed pane to this panel.
 	        add(tabbedPane);         
@@ -382,7 +395,6 @@ public class RT extends JApplet {
 			if(answer.equals("QUERY"))
 			{
 				tab.panelPredict.isPredicting = true;
-				tab.panelPredict.executeButton.setEnabled(true);
 				answer=readObject(socket).toString();
 				DefaultMutableTreeNode root = new DefaultMutableTreeNode ("ROOT");
 				int startString;
@@ -409,7 +421,8 @@ public class RT extends JApplet {
 				}
 				if (tab.panelPredict.firstPred)
 				{
-					tab.panelPredict.tree = new JTree(root);
+					DefaultTreeModel model = (DefaultTreeModel)tab.panelPredict.tree.getModel();
+					model.setRoot(root);
 					tab.panelPredict.queryMsg.add(tab.panelPredict.tree);
 				}
 				else
@@ -419,7 +432,7 @@ public class RT extends JApplet {
 					DefaultMutableTreeNode newRoot = (DefaultMutableTreeNode) model.getRoot();
 					newRoot.removeAllChildren();
 					while (root.getChildCount()!=0)
-						newRoot.add((DefaultMutableTreeNode)root.getChildAt(0));
+						newRoot.add((DefaultMutableTreeNode)root.getChildAt(root.getChildCount() - 1));
 					model.reload(newRoot);
 				}
 
@@ -429,7 +442,6 @@ public class RT extends JApplet {
 			//tab.panelPredict.queryMsg.setText(e.toString());
 			JOptionPane.showMessageDialog(this,e.toString());
 			tab.panelPredict.startButton.setEnabled(true);
-			tab.panelPredict.executeButton.setEnabled(false);
 		}
 	}
 	
@@ -468,9 +480,6 @@ public class RT extends JApplet {
 		}
 		*/
 	
-	/*
-	 *  ****LAVORI IN CORSO****
-	 */
 	void continuePredictingAction()
 	{
 		try
@@ -526,6 +535,7 @@ public class RT extends JApplet {
 				
 				//root.add(new DefaultMutableTreeNode("another_child"));
 				model.reload(root);
+				tab.panelPredict.tree.expandPath(new TreePath(node.getPath()));
 
 			}
 
@@ -536,7 +546,6 @@ public class RT extends JApplet {
 				tab.panelPredict.predictedClass.setText("Predicted class:"+answer);
 				//tab.panelPredict.queryMsg.setText("");
 				tab.panelPredict.startButton.setEnabled(true);
-				tab.panelPredict.executeButton.setEnabled(false);
 				tab.panelPredict.firstPred = false;
 			}
 			
@@ -544,7 +553,6 @@ public class RT extends JApplet {
 				//Printing error message
 				JOptionPane.showMessageDialog(this,answer);
 				tab.panelPredict.startButton.setEnabled(false);
-				tab.panelPredict.executeButton.setEnabled(true);
 			}
 			
 		}
@@ -639,5 +647,16 @@ public class RT extends JApplet {
 			}
 		catch (Exception e) {}
 	}
+	
+	public void mouseClicked(MouseEvent e) { 
+	    if (e.getClickCount() == 1) {
+	    	tab.panelPredict.singleClick = true;
+	    	tab.panelPredict.timer.start();
+	    } else {
+	    	tab.panelPredict.singleClick = false;
+	    }
+	}
 }
+
+
 
