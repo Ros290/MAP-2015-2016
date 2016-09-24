@@ -366,6 +366,7 @@ public class RT extends JApplet {
 		}
 	}
 	
+	
 	/**
      * Trasmette la scelta dell'utente al Server, riceve e visualizza la risposta
      */
