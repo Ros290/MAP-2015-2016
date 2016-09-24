@@ -21,6 +21,14 @@ public class TableData {
 		this.db=db;
 	}
 
+	/**
+     * Ricava lo schema della tabella con nome table, ovvero il paramentro passato
+     * Esegue un'interrogazione per estrarre le tupe distinte e per ogni tupla crea un oggetto istanza della classe Example
+     * In particolare per ogni tupla di estraggono i valori dei singoli campi e li si aggiungono all'oggetto istanza della classe Example
+     *
+     * @param table Stringa indicante il nome della tabella nel database
+     * @return transSet La lista delle transazioni memeorizzate nella tabella
+     */
 	public List<Example> getTransazioni(String table) throws SQLException, EmptySetException, TrainingDataException, UnknownValueException{
 		if (table.isEmpty())
 			throw new UnknownValueException();
@@ -63,11 +71,16 @@ public class TableData {
 		return transSet;
 	}
 	
-	
-	/*
-	 * Formula ed esegue una interrogazione SQL, per estrarre i valori distinti ordinati di column 
+
+	/**
+     * Formula ed esegue una interrogazione SQL, per estrarre i valori distinti ordinati di column 
 	 * e popolare un insieme, opportunamente scelto, da restituire
-	 */
+	 * 
+     * @param table Stringa indicante il nome della tabella nel database
+     * @param column Attributo indicante la colonna da considerare nel database
+     * @return transSet Insieme di valori distinti, ordinati, memorizzati nella tabella
+     * @throws SQLException 
+     */
 	public Set<Object> getDistinctColumnValues(String table, Column column) throws SQLException{
 		
 		Set<Object> transSet = new TreeSet<Object>();

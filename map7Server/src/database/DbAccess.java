@@ -30,6 +30,11 @@ public class DbAccess {
 	//gestisce una connessione
 	private static Connection conn;
 	
+	/**
+     * Carica il driver mysql ed inizializza la connessione riferita da conn
+     *
+     * @throw DatabaseConnectionException  in caso di fallimento della connessione
+     */
 	public static void initConnection() throws DatabaseConnectionException, ClassNotFoundException {
 		String url = DBMS+"://" + SERVER + ":" + PORT + "/" + DATABASE;
 		Class.forName(DRIVER_CLASS_NAME);
@@ -42,10 +47,19 @@ public class DbAccess {
 		}
 	}
 	
+	/**
+     * Restituisce la connessione
+     *
+     * @return conn connessione
+     */
 	public static Connection getConnection(){
 		return conn;
 	}
 	
+	/**
+     * Chiude la connessione
+     *
+    */
 	public void closeConnection() throws SQLException{
 		conn.close();
 	}

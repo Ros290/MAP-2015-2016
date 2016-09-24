@@ -1,5 +1,4 @@
 
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -42,6 +41,7 @@ import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
+//classe che definise un applet eseguibile in un browser web
 public class RT extends JApplet {
 
 	private static final long serialVersionUID = 1L;
@@ -61,17 +61,22 @@ public class RT extends JApplet {
 		out.flush();
 	}
 	
+	//classe privata che estende JPanel, inner class di RT 
 	private class TabbedPane extends JPanel{
 		 private JPanelLearning panelDB;
 		 private JPanelLearning panelFile;
 		 private  JPanelPredicting panelPredict;
 		
+		 //classe privata che estende JPanel, inner class di TabbedPane
 		private class JPanelLearning extends JPanel{
 			private JTextField tableText=new JTextField(20);
 			private JTextArea outputMsg=new JTextArea();
 			private JButton executeButton=new JButton("LEARN");
 			private JButton saveButton=new JButton("SAVE ON PDF");
 			
+			/**
+		     * Inizializza il pannello ed aggiunge l'ascolto al bottone executeButton e saveButton
+		     */
 			JPanelLearning( java.awt.event.ActionListener aLearn, java.awt.event.ActionListener aSave){
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 				JPanel  upPanel=new JPanel();
@@ -95,7 +100,7 @@ public class RT extends JApplet {
 			}
 		}
 		
-		
+		 //classe privata che estende JPanel, inner class di TabbedPane
 		private class JPanelPredicting extends JPanel{
 			private JPanel queryMsg = new JPanel ();
 			private JButton startButton=new JButton("START");
@@ -107,7 +112,9 @@ public class RT extends JApplet {
 		    private int doubleClickDelay = 300;
 		    private Timer timer;    
 			
-			
+		    /**
+		     * Inizializza il pannello ed aggiunge l'ascolto al bottone startButton
+		     */
 			JPanelPredicting( java.awt.event.ActionListener aStart, MouseListener aContinue){
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 				JPanel  upPanel=new JPanel();
@@ -244,6 +251,10 @@ public class RT extends JApplet {
 	private Socket socket;
 	private TabbedPane tab;
 	
+	/**
+     * Inizializza la componente grafica dell'applet istanziando un oggetto della classe JTabbedPane ed aggiungendolo al container dell'applet
+     * Avvia la ricgiesta di connessione al Server ed inizializza i flussi di comunicazione
+     */
 	public void init()
 	{
 		final int port = 8080;
@@ -274,6 +285,9 @@ public class RT extends JApplet {
 		}
 	}
 	
+	/**
+     * Acquisice il nome della tabella, lo trasmette al Server e visualizza i messaggi inviati dal server
+     */
 	void learningFromDBAction(){
 		try
 		{
@@ -313,7 +327,9 @@ public class RT extends JApplet {
 		
 	}
 	
-	
+	/**
+     * Acquisice il nome della tabella, lo trasmette al Server e visualizza i messaggi inviati dal server
+     */
 	void learningFromFileAction(){
 		try{
 			if (!tab.panelPredict.isPredicting)
@@ -350,7 +366,9 @@ public class RT extends JApplet {
 		}
 	}
 	
-	
+	/**
+     * Trasmette la scelta dell'utente al Server, riceve e visualizza la risposta
+     */
 	void startPredictingAction(){
 		try{		
 			tab.panelPredict.startButton.setEnabled(false);			

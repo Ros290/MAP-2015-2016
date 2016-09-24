@@ -13,11 +13,19 @@ public class MultiServer extends Thread{
 	
 	private Socket socket = null;
 	
+	
+	/**
+     * Costruttore, inizializza la porta ed invoca run()
+     */
 	MultiServer(int port){
 		this.PORT = port;
 		super.start();
 	}
 		
+	/**
+     * Istanzia un oggetto istanza della classe SrverOneClient e si pone in attesa du una richiesta di connessione da parte del client
+     * Ad ogni nuova richiesta di connessione di istanzia ServerOneClient 
+     */
 	public void run(){
 		ServerSocket s = null;
 		try{

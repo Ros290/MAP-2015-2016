@@ -37,13 +37,13 @@ public class Data implements Serializable
      * Avvalora explanatorySet, avvalora classAttribue, avvalora il numero di esempi e popola data con gli esempi di taining 
      *
      * @param tableName nome del file contenente i dati
-	 * @throws UnknownValueException 
+	 * @throws UnknownValueException se il valore dell'attributo manca o è fuori range
      * @throw FileNotFoundException se il file non esiste
-     * @throw TrainingDataException
+     * @throw TrainingDataException se vi è un acqisizione errata del TrainingSet
      * @throw ClassNotFoundException
      * @throw DatabaseConnectionException se la connessione con il database fallisce 
      * @throw SQLException
-     * @throw EmptySetException
+     * @throw EmptySetException se il resultSet è vuoto
      */
 	public Data(String tableName)throws FileNotFoundException, TrainingDataException, ClassNotFoundException, DatabaseConnectionException, SQLException, EmptySetException, UnknownValueException
 	{

@@ -1,5 +1,4 @@
-
-				package server;
+package server;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,6 +18,11 @@ class ServeOneClient extends Thread {
     
 	RegressionTree tree;
 
+	/**
+     * Costruttore
+     * Inizializza socket, in ed out
+     * Avvia il thread
+     */
 	public ServeOneClient(Socket s) throws IOException {
 		socket = s;
 		in = new ObjectInputStream(socket.getInputStream());
@@ -41,7 +45,9 @@ class ServeOneClient extends Thread {
 		out.flush();
 	}
 	
-	
+	/**
+     * Riscrive il metodo run() della superclasse, al fine di gestire le richieste del client
+     */
 	public void run()
 	{
 		String result = "";
@@ -131,7 +137,7 @@ class ServeOneClient extends Thread {
 					
 					/*
 					 * Poichè il client è "costretto" a far passare unicamente i valori che gli vengono mostrati
-					 * questa eccezzione, in questo caso, è inutile
+					 * questa eccezione, in questo caso, è inutile
 					 */
 					catch (UnknownValueException e)
 					{}
