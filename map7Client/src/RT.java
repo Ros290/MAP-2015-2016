@@ -1,5 +1,3 @@
-
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -42,6 +40,9 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 
+/*
+ * Definisce un applet eseguibile in un browser web
+ */
 public class RT extends JApplet {
 
 	private static final long serialVersionUID = 1L;
@@ -61,12 +62,20 @@ public class RT extends JApplet {
 		out.flush();
 	}
 	
+	/*
+	 * Classe privata che estende JPanel
+	 * Tale classe è inner class di RT
+	 */
 	private class TabbedPane extends JPanel{
 		 private JPanelLearning panelDB;
 		 private JPanelLearning panelFile;
 		 private  JPanelPredicting panelPredict;
 		
-		private class JPanelLearning extends JPanel{
+		 /*
+		  * Classe privata che estende JPanel
+		  * Tale classe è inner class di TabbedPane
+		  */
+		 private class JPanelLearning extends JPanel{
 			private JTextField tableText=new JTextField(20);
 			private JTextArea outputMsg=new JTextArea();
 			private JButton executeButton=new JButton("LEARN");
@@ -74,7 +83,9 @@ public class RT extends JApplet {
 			
 			protected JFileChooser fileChooser = new JFileChooser();
 			
-			
+			/*
+			  * Inizializza il pannello ed aggiunge l'ascoltatore al bottone executeButton ed al bottone saveButton
+			  */
 			JPanelLearning( java.awt.event.ActionListener aLearn, java.awt.event.ActionListener aSave){
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 				JPanel  upPanel=new JPanel();
@@ -98,7 +109,10 @@ public class RT extends JApplet {
 			}
 		}
 		
-		
+		 /*
+		  * Classe privata che estende JPanel
+		  * Tale classe è inner class di TabbedPane
+		  */
 		private class JPanelPredicting extends JPanel{
 			private JPanel queryMsg = new JPanel ();
 			private JButton startButton=new JButton("START");
@@ -110,7 +124,9 @@ public class RT extends JApplet {
 		    private int doubleClickDelay = 300;
 		    private Timer timer;    
 			
-			
+		    /*
+			  * Inizializza il pannello ed aggiunge l'ascoltatore al bottone startButton
+			  */
 			JPanelPredicting( java.awt.event.ActionListener aStart, MouseListener aContinue){
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 				JPanel  upPanel=new JPanel();
@@ -136,7 +152,10 @@ public class RT extends JApplet {
 			}
 		}
 		
-		
+		/*
+		  * TabbedPane inizializza i membri panelDB, panleFile e panelPredict 
+		  * e li aggiunge ad un oggetto istanza della classe TabbedPane, che è poi inserito nel pannello che si sta costruendo
+		  */
 		TabbedPane() {
 			super(new GridLayout(1, 1)); 
 			JTabbedPane tabbedPane = new JTabbedPane();
@@ -279,10 +298,6 @@ public class RT extends JApplet {
   							
   							System.out.println("Pdf salvato correttamente....");
 							JOptionPane.showMessageDialog(tab.panelFile, "Pdf salvato correttamente!!!");	
-							
-					    
-					
-						
 					}
 					
 				});
@@ -291,6 +306,7 @@ public class RT extends JApplet {
 	        
 	        imgURL = getClass().getResource("img/predizione.jpg");
 	        ImageIcon iconPredict = new ImageIcon(imgURL);
+	        
 			panelPredict = new JPanelPredicting(new java.awt.event.ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 						startPredictingAction();
@@ -318,6 +334,10 @@ public class RT extends JApplet {
 	private Socket socket;
 	private TabbedPane tab;
 	
+	/*
+	  * Inizializza la componente grafica dell'applet istanziando un oggetti della classe JTabbedPane ed aggiungendo al container dell'applet
+	  * Avvia la richiesta di connessione al Server ed inizializza i flussi di comunicazione
+	  */
 	public void init()
 	{
 		final int port = 8080;
@@ -348,6 +368,11 @@ public class RT extends JApplet {
 		}
 	}
 	
+	/*
+	 * Acquisisce il nome della tabella e lo trasmette al Server
+	 * Trasmette al server il comando 1
+	 * Infine visualizza i messaggi inviati dal server
+	  */
 	void learningFromDBAction(){
 		try
 		{
@@ -381,13 +406,14 @@ public class RT extends JApplet {
 		}
 		catch(IOException | ClassNotFoundException   e){
 			JOptionPane.showMessageDialog(this,e.toString());
-		}
-		
-		
-		
+		}	
 	}
 	
-	
+	/*
+	 * Trasmette al server il comando 2
+	 * Acquisisce il nome della tabella e lo trasmette al Server
+	 * Infine visualizza i messaggi inviati dal server
+	  */
 	void learningFromFileAction(){
 		try{
 			if (!tab.panelPredict.isPredicting)
@@ -424,7 +450,13 @@ public class RT extends JApplet {
 		}
 	}
 	
-	
+	/*
+	 * Trasmette al server il comando 3
+	 * Legge la risosta
+	 * Se la risposta è QUERY allora legge la successiva risposta dal server e la visualizza, 
+	 * altrimenti de la risposta è OK legge la succesiva risposta dal server e la visualizza, abilitando il pulsante START,
+	 * altrimenti visulizza la risposta e abilita il pulsante START
+	  */
 	void startPredictingAction(){
 		try{		
 			tab.panelPredict.startButton.setEnabled(false);			
