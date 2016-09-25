@@ -1,4 +1,5 @@
 
+
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -7,6 +8,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -34,14 +37,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 
-//classe che definise un applet eseguibile in un browser web
 public class RT extends JApplet {
 
 	private static final long serialVersionUID = 1L;
@@ -61,22 +61,20 @@ public class RT extends JApplet {
 		out.flush();
 	}
 	
-	//classe privata che estende JPanel, inner class di RT 
 	private class TabbedPane extends JPanel{
 		 private JPanelLearning panelDB;
 		 private JPanelLearning panelFile;
 		 private  JPanelPredicting panelPredict;
 		
-		 //classe privata che estende JPanel, inner class di TabbedPane
 		private class JPanelLearning extends JPanel{
 			private JTextField tableText=new JTextField(20);
 			private JTextArea outputMsg=new JTextArea();
 			private JButton executeButton=new JButton("LEARN");
 			private JButton saveButton=new JButton("SAVE ON PDF");
 			
-			/**
-		     * Inizializza il pannello ed aggiunge l'ascolto al bottone executeButton e saveButton
-		     */
+			protected JFileChooser fileChooser = new JFileChooser();
+			
+			
 			JPanelLearning( java.awt.event.ActionListener aLearn, java.awt.event.ActionListener aSave){
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 				JPanel  upPanel=new JPanel();
@@ -100,7 +98,7 @@ public class RT extends JApplet {
 			}
 		}
 		
-		 //classe privata che estende JPanel, inner class di TabbedPane
+		
 		private class JPanelPredicting extends JPanel{
 			private JPanel queryMsg = new JPanel ();
 			private JButton startButton=new JButton("START");
@@ -112,9 +110,7 @@ public class RT extends JApplet {
 		    private int doubleClickDelay = 300;
 		    private Timer timer;    
 			
-		    /**
-		     * Inizializza il pannello ed aggiunge l'ascolto al bottone startButton
-		     */
+			
 			JPanelPredicting( java.awt.event.ActionListener aStart, MouseListener aContinue){
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 				JPanel  upPanel=new JPanel();
@@ -159,25 +155,61 @@ public class RT extends JApplet {
 							JFileChooser fileChooser = new JFileChooser();
 							fileChooser.setMultiSelectionEnabled(false);
 							fileChooser.setFileFilter(new FileNameExtensionFilter("PDF file", "pdf"));
+				
+						
+							((JFileChooser) tab.panelDB.fileChooser).setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-							if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) 
-							{
-								File file = fileChooser.getSelectedFile();
-								String fileName = file.getName();
-								int i = fileName.indexOf('.');
-								try 
-								{
-									if (i >= 0 && fileName.substring(i + 1).equalsIgnoreCase("pdf"))
-										PDFcreator(file.getAbsolutePath(),tab.panelDB.outputMsg.getText());
-									
-									else
-										PDFcreator(file.getAbsolutePath() + ".pdf","NOME TABELLA:   "+ tab.panelDB.tableText.getText() + "\n" + tab.panelDB.outputMsg.getText());
-								} 
-								catch (Exception e1) 
-								{
-									e1.printStackTrace();
-								}
-							}	
+							int choice = tab.panelDB.fileChooser.showSaveDialog(getParent());
+
+							if (choice != JFileChooser.APPROVE_OPTION) return;
+
+							String dest=tab.panelDB.fileChooser.getSelectedFile().getAbsolutePath()+".pdf";
+							File file = new File(dest);
+
+							file.getParentFile().mkdirs();
+	
+							Document document = new Document();
+
+						
+							try {
+								PdfWriter.getInstance(document, new FileOutputStream(dest));
+							} catch (FileNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (DocumentException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+
+							com.itextpdf.text.Rectangle two = new com.itextpdf.text.Rectangle(700,400);
+
+							document.open();
+
+							Paragraph p = new Paragraph("Tabella: "+tab.panelDB.tableText.getText());
+							p.add(new Paragraph(" "));
+							try {
+								document.add(p);
+							} catch (DocumentException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+							Paragraph p1 = new Paragraph("REGRESSION TREE E REGOLE GENERATE  \n \n"+tab.panelDB.outputMsg.getText());
+							try {
+								document.add(p1);
+							} catch (DocumentException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+							document.setPageSize(two);
+  							document.close();
+  							
+  							System.out.println("Pdf salvato correttamente....");
+							JOptionPane.showMessageDialog(tab.panelDB, "Pdf salvato correttamente!!!");	
+							
+					    
 					}
 				});
 	        tabbedPane.addTab("DB", iconDB, panelDB);
@@ -195,26 +227,61 @@ public class RT extends JApplet {
 							JFileChooser fileChooser = new JFileChooser();
 							fileChooser.setMultiSelectionEnabled(false);
 							fileChooser.setFileFilter(new FileNameExtensionFilter("PDF file", "pdf"));
+							
+							((JFileChooser) tab.panelFile.fileChooser).setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-							if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) 
-							{
-								File file = fileChooser.getSelectedFile();
-								String fileName = file.getName();
-								int i = fileName.indexOf('.');
-								try 
-								{
-									if (i >= 0 && fileName.substring(i + 1).equalsIgnoreCase("pdf"))
-										PDFcreator(file.getAbsolutePath(), tab.panelFile.outputMsg.getText());
-									
-									else
-										PDFcreator(file.getAbsolutePath() + ".pdf", "NOME TABELLA:   "+ tab.panelFile.tableText.getText() + "\n" + tab.panelFile.outputMsg.getText());
-								} 
-								catch (Exception e1) 
-								{
-									e1.printStackTrace();
-								}
-								
+							int choice = tab.panelFile.fileChooser.showSaveDialog(getParent());
+
+							if (choice != JFileChooser.APPROVE_OPTION) return;
+
+							String dest=tab.panelFile.fileChooser.getSelectedFile().getAbsolutePath()+".pdf";
+							File file = new File(dest);
+
+							file.getParentFile().mkdirs();
+	
+							Document document = new Document();
+
+						
+							try {
+								PdfWriter.getInstance(document, new FileOutputStream(dest));
+							} catch (FileNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (DocumentException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
 							}
+							
+
+							com.itextpdf.text.Rectangle two = new com.itextpdf.text.Rectangle(700,400);
+
+							document.open();
+
+							Paragraph p = new Paragraph("Tabella: "+tab.panelFile.tableText.getText());
+							p.add(new Paragraph(" "));
+							try {
+								document.add(p);
+							} catch (DocumentException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+							Paragraph p1 = new Paragraph("REGRESSION TREE E REGOLE GENERATE  \n \n"+tab.panelFile.outputMsg.getText());
+							try {
+								document.add(p1);
+							} catch (DocumentException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+							document.setPageSize(two);
+  							document.close();
+  							
+  							System.out.println("Pdf salvato correttamente....");
+							JOptionPane.showMessageDialog(tab.panelFile, "Pdf salvato correttamente!!!");	
+							
+					    
+					
 						
 					}
 					
@@ -251,10 +318,6 @@ public class RT extends JApplet {
 	private Socket socket;
 	private TabbedPane tab;
 	
-	/**
-     * Inizializza la componente grafica dell'applet istanziando un oggetto della classe JTabbedPane ed aggiungendolo al container dell'applet
-     * Avvia la ricgiesta di connessione al Server ed inizializza i flussi di comunicazione
-     */
 	public void init()
 	{
 		final int port = 8080;
@@ -285,9 +348,6 @@ public class RT extends JApplet {
 		}
 	}
 	
-	/**
-     * Acquisice il nome della tabella, lo trasmette al Server e visualizza i messaggi inviati dal server
-     */
 	void learningFromDBAction(){
 		try
 		{
@@ -327,9 +387,7 @@ public class RT extends JApplet {
 		
 	}
 	
-	/**
-     * Acquisice il nome della tabella, lo trasmette al Server e visualizza i messaggi inviati dal server
-     */
+	
 	void learningFromFileAction(){
 		try{
 			if (!tab.panelPredict.isPredicting)
@@ -367,9 +425,6 @@ public class RT extends JApplet {
 	}
 	
 	
-	/**
-     * Trasmette la scelta dell'utente al Server, riceve e visualizza la risposta
-     */
 	void startPredictingAction(){
 		try{		
 			tab.panelPredict.startButton.setEnabled(false);			
@@ -503,72 +558,7 @@ public class RT extends JApplet {
 	}
 	
 	
-	void PDFcreator (String title, String text)
-	{
-		try
-		{
-			
-	        PDDocument doc = new PDDocument();
-	        PDPage page = new PDPage();
-	        doc.addPage(page);
-	        PDPageContentStream contentStream = new PDPageContentStream(doc, page);
-
-	        PDFont pdfFont = PDType1Font.HELVETICA;
-	        float fontSize = 12;
-	        float leading = 1.5f * fontSize;
-
-	        PDRectangle mediabox = page.findMediaBox();
-	        float margin = 72;
-	        float startX = mediabox.getLowerLeftX() + margin/2;
-	        float startY = mediabox.getUpperRightY() - margin;
-			float center = mediabox.getWidth() /5.0f;
-	      	
-	        List<String> lines = new ArrayList<String>();
-	               	     
-	        int lastSpace = -1;
-	                	
-	        while (text.length() > 0)
-	        {
-	            int spaceIndex = text.indexOf('\n');
-	                              	
-	            if (spaceIndex < 0)
-	            {   
-	            	       	
-	                lines.add(text);
-	                text = "";
-	            }
-	            else
-	            {
-	                String subString = text.substring(0, spaceIndex);
-					if (lastSpace < 0)
-						lastSpace = spaceIndex;
-					else
-						lastSpace = spaceIndex;
-					lines.add(subString);
-					text = text.substring(lastSpace).trim();
-					lastSpace = -1;
-	            }
-	        }
-	        contentStream.beginText();
-	        contentStream.setFont(pdfFont, fontSize);
-	        contentStream.moveTextPositionByAmount(startX, startY + margin - center);
-	        
-	        for (String line: lines)
-	        {
-	            contentStream.drawString(line);
-	            contentStream.moveTextPositionByAmount(0, -leading);
-	        }
-	        contentStream.endText(); 
-			contentStream.close();
-			doc.save(title);
-			doc.close();
-			System.out.println("File PDF salvato correttamente...");
-			JOptionPane.showMessageDialog(this,"File PDF salvato correttamente!!!");
-			
-			
-			}
-		catch (Exception e) {}
-	}
+	
 	
 	public void mouseClicked(MouseEvent e) 
 	{ 
