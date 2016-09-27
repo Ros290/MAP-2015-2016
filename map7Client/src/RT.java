@@ -117,16 +117,27 @@ public class RT extends JApplet {
 			private JPanel queryMsg = new JPanel ();
 			private JButton startButton=new JButton("START");
 			private JLabel predictedClass = new JLabel("");
+			// struttura quale conterrà la rappresentazione grafica dell'albero di regressione
 			private JTree tree = new JTree();
+			// questa flag indica se si sta effettuando la prima predizione dall'avvio del client o no.
+			// per capire a cosa effettivamente serve, andare a vedere startPrediction()
 			private boolean firstPred = true;
+			// indica se il client sta ancora operando sulla predizione (ovvero, non ha ancora terminato).
+			// all'avvio di qualsiasi predizione, viene settato a true, così da NON permettere di cambiare tabella
+			// fino a quando non termina la predizione
 			private boolean isPredicting = false;
+			//variabili necessari per catturari i click eseguiti sui nodi dell'albero di regressione
 		    private boolean singleClick  = true;
 		    private int doubleClickDelay = 300;
-		    private Timer timer;    
+		    private Timer timer;     
 			
 		    /*
 			  * Inizializza il pannello ed aggiunge l'ascoltatore al bottone startButton
 			  */
+		    
+			//notare che, come secondo parametro, c'è MouseListener, questo perchè
+		    //non sarà più soltanto il bottone a definire una determinata azione, ma anche i click effettuati col mouse
+		    
 			JPanelPredicting( java.awt.event.ActionListener aStart, MouseListener aContinue){
 				setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 				JPanel  upPanel=new JPanel();
@@ -312,10 +323,19 @@ public class RT extends JApplet {
 						startPredictingAction();
 				}
 		      },
+		      // per ogni click effettuato, il sistema rimanda a questa porzione di codice
 		      new MouseAdapter() {
+		    	  // la variabile 'e' conterrà tutte le info determinanti a stabilire quanti click sono stati compiuti
 		          public void mouseClicked(MouseEvent e) {
+		        	  // verifico che , prima di tutto, siano stati effettuati due click (indipendentemente se li ha fatto clickando su un
+		        	  // o su un punto vuoto dello schermo
 		              if (e.getClickCount() == 2) {
+		            	  // catturo il nodo selezionato ( node = tree.getLastSelectedPathComponent())
+		            	  // se non è stato clickato alcun nodo, allora node = null
 		                  DefaultMutableTreeNode node = (DefaultMutableTreeNode) tab.panelPredict.tree.getLastSelectedPathComponent();
+		                  // quindi ci assicuriamo che, prima di passare a continuePredicting, sia stato effettivamente clickato
+		                  // su un nodo (if node != null) e , in tal caso , se esso sia effettivamente un nodo figlio o n
+		                  // (if node.isLeaf), altrimenti non fa nulla
 		                  if ((node != null) && (node.isLeaf()) && (tab.panelPredict.isPredicting)) continuePredictingAction();
 		              }
 		          }
@@ -465,23 +485,45 @@ public class RT extends JApplet {
 			String answer=readObject(socket).toString();			
 			if(answer.equals("QUERY"))
 			{
+				// setto la flag a true, così da nn permettere l'acquisizione di nuove tabelle fino alla fine della predizione
 				tab.panelPredict.isPredicting = true;
 				answer=readObject(socket).toString();
+				// da qua comincia la costruzione dell'albero di regressione, per semplicità ho denominato la radice
+				// come "Root"
 				DefaultMutableTreeNode root = new DefaultMutableTreeNode ("ROOT");
+				// il codice che sta di seguito riportato, serve per riconoscere i nodi dalla stringa
+				// ottenuta dal server (infatti il server non è stato proprio toccato)
 				int startString;
 				int spaceString;
 				String subString = "";
+				// qui saranno contenute le stringhe che rappresenteranno i nodi figli di "Root"
 				List <String> listNodes = new ArrayList<String> ();
+				// premessa: vi ricordo che il server non è stato cambiato, quindi la stringa che
+				// rappresenta la richiesta del server è così strutturata:
+				// *** 0: X = A\n ***
+				// *** 1: X = B\n ***
+				// eccetera... (p.s. gli asterschi non c'entrano).
 				while (answer.length() > 0)
 				{
+					// definisco in start la posizione del primo : che trovo nella stringa
+					// 0: X = A\n , quindi start = 2
 					startString = answer.indexOf(':');
+					// definisco in space la posizione del primo \n che trovo nella stringa
+					// 0: X = A\n , quindi space = 9
 					spaceString = answer.indexOf('\n');
+					// definisco una sotto stringa che consista nella parte che va da dopo : fino a \n e lo aggiungo alla lista
+					// quindi da essere 0: X = A\n, diventa solo X = A
 					subString = answer.substring(startString+1, spaceString);
 					listNodes.add(subString);
+					// rimuovo la sotto stringa appena acquisita come nodo, e passo alle successive, partendo 
+					// dalla posizione succesiva di quella dell'ultima \n ricavata
+					// quindi passo ad analizzare 1: X = B\n e così via dicendo
 					answer = answer.substring(spaceString+1);
 				}
 				int n = listNodes.size();
+				// definisco tanti nodi quanti sono le stringhe contenute nella lista
 				DefaultMutableTreeNode childs [] = new DefaultMutableTreeNode [n];
+				// definisco ciascun nodo con la stringa associata nella lista, e lo definisco come figlio di Root ( root.add(childs[i]) )
 				for (int i = 0; i < n ; i++)
 				{
 					childs [i] = new DefaultMutableTreeNode (listNodes.get(i));
@@ -490,18 +532,37 @@ public class RT extends JApplet {
 				tab.panelPredict.predictedClass.setText("*** Phase Prediction started ***");
 				if (tab.panelPredict.firstPred)
 				{
+					// in pratica non faccio altro che caricare in schermata il modello attuale dell'albero, semplicemente
 					DefaultTreeModel model = (DefaultTreeModel)tab.panelPredict.tree.getModel();
 					model.setRoot(root);
 					tab.panelPredict.queryMsg.add(tab.panelPredict.tree);
 				}
 				else
 				{
+					// premessa: appena si effettua una nuova predizione, bisogna caricare su video la nuova struttura
+					// dell'albero, qualora siano state fatte altre predizioni. Il problema è che, anche se decidiamo di
+					// cancellare totalmente l'albero della precidizione precedente, per far spazio ad uno nuovo, 
+					// sullo schermo rimangono però " i segni" dell'albero precedente... nel senso che alcuni nodi del vecchio
+					// albero rimangono visibili
+					// Per ovviare a questo problema, sono stati adottati i "modelli" DefaultTreeModel, quale permettono, diciamo, azioni
+					// in più rispetto ad un semplice JTree, sopratutto per quanto riguarda la rappresentazione grafica.
+					// In sostanza, se volete capire coi vostri occhi del motivo di tutto ciò, sostituite DefaultTreeModel con Jtree.
+					
+					// questa cosa non doveva esserci , vabbè mia svista
 					tab.panelPredict.predictedClass.setText("");
+					// definisco il modello dell'albero della predizione PRECEDENTE
 					DefaultTreeModel model = (DefaultTreeModel)tab.panelPredict.tree.getModel();
+					// definisco la radice sempre dello stesso albero come NewRoot, e rimuovo tutti i suoi figli, quindi anche i figli dei figli ecc
+					// così facendo riavremo nuovamente il nostro albero che ha solo un nodo radice e sarà il punto di partenza del nuovo albero
 					DefaultMutableTreeNode newRoot = (DefaultMutableTreeNode) model.getRoot();
 					newRoot.removeAllChildren();
+					// attenzione, la funzione getChildAt di un nodo, funge come la funzione pop() di una pila,
+					// ovvero rimuovendo l'elemento preso dalla struttura che lo conteneva. Quindi per ogni root.getChildAt, il numero dei
+					// figli di root diminuisce
 					while (root.getChildCount()!=0)
 						newRoot.add((DefaultMutableTreeNode)root.getChildAt(0));
+					// la comodità di definire il modello dell'albero, è che permette di ricaricare la rappresentazione grafica 
+					// dell'albero, per quante aggiunte/rimozioni siano state fatte
 					model.reload(newRoot);
 				}
 			}
@@ -529,9 +590,16 @@ public class RT extends JApplet {
 	{
 		try
 		{
+			// definisco in node, il nodo (foglia) selezionato
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) tab.panelPredict.tree.getLastSelectedPathComponent();
+			// definisco in parent, il padre di node
 			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
+			// definisco l'indice di parent
 			int choice = parent.getIndex(node);
+			// qui cancelliamo tutti i figli di parent, a parte node.
+			// questo serve affinchè il client non possa optare per "ritornare indietro" col percorso
+			// e scegliere un nodo differrente dalla quello scelto, perchè questa versione del programma
+			// non consente azioni del genere
 			int nChildren = parent.getChildCount() -1;
 			while (nChildren >= 0 )
 			{
@@ -541,12 +609,15 @@ public class RT extends JApplet {
 			}
 			DefaultTreeModel model = (DefaultTreeModel)tab.panelPredict.tree.getModel();
 			DefaultMutableTreeNode root = (DefaultMutableTreeNode) parent;
+			// ricarico l'albero, poichè c'è stata una modifica nella struttura
 			model.reload(root);
 			writeObject(socket,new Integer(choice));
 			System.out.println("Continuing prediction phase!");
 			String answer=readObject(socket).toString();
 			if(answer.equals("QUERY"))
 			{
+				// questa parte è praticamente identica a startPrediction, solo che i nodi ricavati
+				// dal server vengono aggiunti direttamente su node (il nodo selezionato)
 				answer=readObject(socket).toString();
 				int startString;
 				int spaceString;
@@ -568,14 +639,18 @@ public class RT extends JApplet {
 					node.add(childs[i]);
 				}
 				model.reload(root);
+				//senza questa istruzione, vedremmo solo il nodo selezionato , per vedere i suoi figli dovremmo clickarci sopra
+				// così invece vediamo subito quali siano i suoi figli
 				tab.panelPredict.tree.expandPath(new TreePath(node.getPath()));
 			}
 			else if(answer.equals("OK"))
 			{ 
+				// la predizione è terminata, quindi isPred = false
 				tab.panelPredict.isPredicting = false;
 				answer=readObject(socket).toString();
 				tab.panelPredict.predictedClass.setText("Predicted class:"+answer);
 				tab.panelPredict.startButton.setEnabled(true);
+				// che sia o no la prima predizione questa, firstPred viene comunque settata a false
 				tab.panelPredict.firstPred = false;
 			}
 			else {
